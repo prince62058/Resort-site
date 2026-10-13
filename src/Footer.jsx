@@ -68,7 +68,7 @@ function Newsletter() {
   return <section className="nest-newsletter" aria-labelledby="newsletter-title">
     <Sculpture kind="leaf"/>
     <span className="nest-kicker">STAY IN THE KNOW</span>
-    <h3 id="newsletter-title">A little note<br/>from <em>the nest.</em></h3>
+    <h3 id="newsletter-title">A little note from <em>the nest.</em></h3>
     <p>Subscribe to our newsletter for resort news and inspiration for your next escape.</p>
     <form onSubmit={event => {
       event.preventDefault();
@@ -89,13 +89,13 @@ export default function Footer({book}) {
     <footer className="nest-footer" aria-label="The Nature Nest footer">
       <div className="nest-footer-inner">
         <div className="nest-footer-welcome">
-          <div><span className="nest-kicker"><span/> YOUR LITTLE CORNER OF MHOW, INDORE</span><h2>Come for the quiet.<br/>Stay for <em>the feeling.</em></h2></div>
+          <div><span className="nest-kicker"><span/> YOUR LITTLE CORNER OF MHOW, INDORE</span><h2>Come for the quiet. Stay for <em>the feeling.</em></h2></div>
           <div className="nest-footer-escape"><p>Green surroundings. Warm welcomes.<br/>A little time that’s entirely yours.</p><button onClick={() => book({})}>Book your escape<span><ArrowUpRight size={24}/></span></button></div>
         </div>
         <div className="nest-footer-grid">
           <section className="nest-footer-contact" aria-label="Resort contact details">
             <Link to="/" className="nest-footer-brand" aria-label="The Nature Nest home"><Brand3D/></Link>
-            <p className="nest-brand-note">A little closer to nature.<br/>A little closer to you.</p>
+            <p className="nest-brand-note">A little closer to nature. A little closer to you.</p>
             <address>
               <a href={contact.phoneLink} className="nest-contact-row"><span className="nest-contact-icon"><Phone size={16}/></span><span><small>GIVE US A CALL</small>{contact.phone}</span></a>
               <a href={`mailto:${contact.email}`} className="nest-contact-row"><span className="nest-contact-icon"><Mail size={16}/></span><span><small>DROP US A NOTE</small>{contact.email}</span></a>
