@@ -1,3 +1,6 @@
+import seed from '../../shared/seed.json' with {type:'json'};
+import {guestPageIds} from '../../shared/guest-pages.js';
+import {migrateGuestPages} from '../../server/cms/migrations.js';
 import assert from 'node:assert/strict';
 import {randomBytes} from 'node:crypto';
 import {mkdir} from 'node:fs/promises';
@@ -12,6 +15,8 @@ const token=randomBytes(32).toString('hex'),password=randomBytes(24).toString('h
 let server,browser;
 try {
  await client.connect();const db=client.db(dbName);const store={db,assets:db.collection('media_assets'),files:db.collection('resort_media.files'),bucket:new GridFSBucket(db,{bucketName:'resort_media'})};
+ const original=structuredClone(seed);original.pages=original.pages.filter(p=>!guestPageIds.includes(p.id));const pending=structuredClone(original);pending.rooms[0].summary='Pending owner draft';
+ await db.collection('cms_content').insertOne({_id:'site',version:1,draft:pending,published:original,redirects:{},updatedAt:new Date(),publishedAt:new Date()});
  server=createApp({getStore:async()=>store,configured:()=>true,authOptions:{setupToken:()=>token,production:()=>false}}).listen(0,'127.0.0.1');await new Promise(r=>server.once('listening',r));const base='http://127.0.0.1:'+server.address().port;
  let cookie='',csrf='';
  async function request(path,{method='GET',body,headers={},auth=true,raw=false,redirect='follow'}={}) {
@@ -24,6 +29,8 @@ try {
  cookie=result.response.headers.get('set-cookie').split(';')[0];csrf=result.json.csrf;assert.match(result.response.headers.get('set-cookie'),/HttpOnly/);assert.match(result.response.headers.get('set-cookie'),/SameSite=Strict/);
  assert.equal((await request('/api/admin/setup',{method:'POST',body:{email,password,setupToken:token}})).response.status,409);
  let doc=(await request('/api/admin/content')).json;
+ assert.equal(doc.content.rooms[0].summary,'Pending owner draft');assert.equal(doc.content.pages.length,12);assert.equal((await request('/api/content')).json.content.rooms.find(r=>r.id===original.rooms[0].id).summary,original.rooms[0].summary);
+ await migrateGuestPages(db);assert.equal((await request('/api/admin/content')).json.version,doc.version);
  let c=structuredClone(doc.content);const room=c.rooms[0],oldSlug=room.slug;room.slug='seo-test-garden-villa';room.name='Garden Villa Test';room.seo.title='Garden Villa near Indore | Test';room.seo.description='A quiet garden villa for a relaxed stay in Mhow, near Indore.';c.settings.siteUrl=base;
  const saveBody={content:c,version:doc.version,publish:false};
  assert.equal((await request('/api/admin/content',{method:'PUT',body:saveBody,headers:{'X-CSRF-Token':''}})).response.status,403);
@@ -33,6 +40,10 @@ try {
  result=await request('/api/admin/content',{method:'PUT',body:{content:c,version:doc.version,publish:true}});assert.equal(result.response.status,200);doc=result.json;
  assert.equal((await request('/api/admin/content',{method:'PUT',body:{content:c,version:1,publish:true}})).response.status,409);
  const custom={...structuredClone(c.pages[0]),id:'weekend-retreat',slug:'weekend-retreat-mhow',name:'Weekend retreat in Mhow',template:'custom',heading:'Your weekend retreat',body:'A quiet weekend with your favourite people.',footerLabel:'Weekend retreat',nav:true,order:20};c.pages.push(custom);doc=(await request('/api/admin/content',{method:'PUT',body:{content:c,version:doc.version,publish:true}})).json;
+ const privacy=c.pages.find(p=>p.id==='privacy-policy');privacy.slug='privacy-at-the-nest';privacy.heading='Your privacy at the nest';privacy.body+='\n\n## Owner policy update\n\nContact {{email}} about your data.';
+ doc=(await request('/api/admin/content',{method:'PUT',body:{content:c,version:doc.version,publish:true}})).json;
+ const policyRedirect=await fetch(base+'/privacy-policy',{redirect:'manual'});assert.equal(policyRedirect.status,301);assert.equal(policyRedirect.headers.get('location'),'/privacy-at-the-nest');
+ const policyHtml=await (await fetch(base+'/privacy-at-the-nest')).text();assert.match(policyHtml,/Owner policy update/);assert.doesNotMatch(policyHtml,/<p>Contact \{\{email/);assert.match(await (await fetch(base+'/sitemap.xml')).text(),/privacy-at-the-nest/);
  const published=(await request('/api/content')).json;assert.ok(published.content.rooms.some(r=>r.name==='Garden Villa Test'));
  const redir=await fetch(base+'/rooms/'+oldSlug,{redirect:'manual'});assert.equal(redir.status,301);assert.equal(redir.headers.get('location'),'/rooms/seo-test-garden-villa');
  const html=await (await fetch(base+'/rooms/seo-test-garden-villa')).text();assert.match(html,/<title>Garden Villa near Indore \| Test<\/title>/);assert.match(html,/<h1>Garden Villa Test<\/h1>/);assert.match(html,/application\/ld\+json/);assert.match(await (await fetch(base+'/sitemap.xml')).text(),/seo-test-garden-villa/);assert.equal((await fetch(base+'/unpublished-test-page')).status,404);
@@ -55,7 +66,9 @@ try {
  await page.getByRole('button',{name:'Publish changes'}).click();await page.getByRole('status').filter({hasText:'Published.'}).waitFor();
  await page.screenshot({path:'output/admin/stay-editor-desktop.png',fullPage:true});
  assert.ok((await request('/api/content')).json.content.rooms.some(r=>r.name==='Updated in Admin UI'));
- const publicPage=await browser.newPage();await publicPage.goto(base+'/rooms/premium-garden-villa-mhow');await publicPage.getByRole('heading',{name:'Updated in Admin UI',exact:true}).waitFor();await publicPage.goto(base+'/weekend-retreat-mhow');await publicPage.getByRole('heading',{name:'Your weekend retreat',exact:true}).waitFor();assert.ok(await publicPage.getByText('A quiet weekend with your favourite people.',{exact:true}).isVisible());await publicPage.close();
+ const publicPage=await browser.newPage();await publicPage.goto(base+'/rooms/premium-garden-villa-mhow');await publicPage.getByRole('heading',{name:'Updated in Admin UI',exact:true}).waitFor();await publicPage.goto(base+'/weekend-retreat-mhow');await publicPage.getByRole('heading',{name:'Your weekend retreat',exact:true}).waitFor();assert.ok(await publicPage.getByText('A quiet weekend with your favourite people.',{exact:true}).isVisible());
+ await publicPage.goto(base+'/privacy-at-the-nest');await publicPage.getByRole('heading',{name:'Owner policy update',exact:true}).waitFor();assert.equal(await publicPage.locator('.nest-newsletter').getByRole('link',{name:'Privacy policy',exact:true}).getAttribute('href'),'/privacy-at-the-nest');await publicPage.close();
+ await page.getByRole('navigation').getByRole('button',{name:'Pages & SEO',exact:true}).click();await page.getByRole('button',{name:/Privacy policy.*SEO details added/}).click();assert.match(await page.getByLabel('Page content',{exact:false}).inputValue(),/Owner policy update/);await page.getByLabel('Last updated date').fill('2026-10-14');await page.getByLabel('Page content',{exact:false}).fill(privacy.body+'\n\nSaved from the policy editor.');await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.getByRole('status').filter({hasText:'Draft saved'}).waitFor();assert.match((await request('/api/admin/content')).json.content.pages.find(p=>p.id==='privacy-policy').body,/Saved from the policy editor/);await page.screenshot({path:'output/admin/policy-editor-desktop.png',fullPage:true});
  await page.reload();await page.getByRole('heading',{name:'A little care. A better stay.'}).waitFor();
  await page.setViewportSize({width:390,height:844});await page.getByRole('button',{name:'Open navigation',exact:true}).click();await page.getByRole('navigation').getByRole('button',{name:'Pages & SEO',exact:true}).click();await page.screenshot({path:'output/admin/pages-mobile.png',fullPage:true});
  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));

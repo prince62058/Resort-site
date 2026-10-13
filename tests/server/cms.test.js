@@ -2,7 +2,9 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import seed from '../../shared/seed.json' with {type:'json'};
 import {parseContent} from '../../server/cms/schema.js';
-import {seoFor,seoHead,safeJson} from '../../shared/seo.js';
+import {seoFor,seoHead,safeJson,initialMarkup} from '../../shared/seo.js';
+import {documentBlocks, guestPath, guestPageIds} from '../../shared/guest-pages.js';
+import {withGuestPages} from '../../server/cms/migrations.js';
 import {publicContent,linkTo,resolveRoute} from '../../shared/content.js';
 import {passwordHash,verifyPassword} from '../../server/cms/auth.js';
 test('content validation rejects reserved, duplicate and unsafe URL input',()=>{
@@ -18,4 +20,17 @@ test('server SEO escapes scripts and produces canonical metadata and noindex on 
 });
 test('password hashing salts and verifies without storing the plaintext',async()=>{
  const password='test-only-long-password';const a=await passwordHash(password),b=await passwordHash(password);assert.notEqual(a,b);assert.ok(!a.includes(password));assert.equal(await verifyPassword(password,a),true);assert.equal(await verifyPassword('incorrect-password',a),false);
+});
+test('guest page upgrade adds missing defaults without replacing edits or colliding with slugs',()=>{
+ const old=structuredClone(seed);old.pages=old.pages.filter(p=>!guestPageIds.includes(p.id));old.copy['guest.privacyLink']='My privacy notice';old.settings.email='owner@example.test';
+ old.pages.push({...structuredClone(seed.pages[0]),id:'existing-custom',slug:'privacy-policy',template:'custom',name:'Existing custom page'});
+ const next=withGuestPages(old);assert.equal(next.pages.length,old.pages.length+5);assert.equal(next.pages.find(p=>p.id==='privacy-policy').slug,'privacy-policy-2');assert.equal(next.copy['guest.privacyLink'],'My privacy notice');assert.equal(next.settings.email,'owner@example.test');
+ next.pages.find(p=>p.id==='privacy-policy').body='Owner-edited policy';assert.deepEqual(withGuestPages(next),next);assert.equal(old.pages.length,8);assert.doesNotThrow(()=>parseContent(next));
+});
+test('guest notices link to edited slugs, omit drafts and safely format contact tokens',()=>{
+ const content=structuredClone(seed),page=content.pages.find(p=>p.id==='privacy-policy');page.slug='your-privacy';assert.equal(guestPath(content,page.id),'/your-privacy');page.status='draft';assert.equal(guestPath(content,page.id),null);
+ const blocks=documentBlocks('## Your details\n\nEmail {{email}}\nfor help.\n\n- One\n- Two\n\n### Next\n<script>alert(1)</script>',{email:'team@example.test'});
+ assert.equal(blocks[1].text,'Email team@example.test for help.');assert.deepEqual(blocks[2].items,['One','Two']);assert.equal(blocks[3].id,'section-2');
+ page.status='published';page.body='## Safe heading\n\n<script>alert(1)</script>\n\nEmail {{email}}';const html=initialMarkup(content,resolveRoute(content,'/your-privacy'));
+ assert.match(html,/<h2 id="section-1">Safe heading<\/h2>/);assert.doesNotMatch(html,/<script>/);assert.doesNotMatch(html,/\{\{email\}\}/);assert.match(html,/info@thenaturenestresort.com/);
 });

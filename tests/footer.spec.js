@@ -12,18 +12,14 @@ test('footer keeps resort information and provides working guest actions', async
   await expect(footer.locator('a[href="tel:+917777878822"]')).toHaveText(/077778 78822/);
   await expect(footer.locator('a[href="mailto:info@thenaturenestresort.com"]')).toBeVisible();
   await expect(footer.getByRole('link', {name: /The Nature Nest on/})).toHaveCount(3);
-  await footer.getByRole('button', {name: 'FAQ', exact: true}).click();
-  const dialog = page.getByRole('dialog');
-  await expect(dialog).toContainText('A few helpful answers.');
-  await dialog.getByText('How do I book a stay?', {exact: true}).click();
-  await expect(dialog.getByText(/Our team will confirm availability/)).toBeVisible();
-  await page.keyboard.press('Escape');
-  await expect(dialog).toHaveCount(0);
-  await expect(footer.getByRole('button', {name: 'FAQ', exact: true})).toBeFocused();
-  for (const [button, request] of [['Privacy', 'Request privacy policy'], ['Terms & conditions', 'Request booking terms']]) {
-    await footer.getByRole('button', {name: button, exact: true}).click();
-    await expect(page.getByRole('dialog').getByRole('link', {name: request})).toHaveAttribute('href', /^mailto:info@thenaturenestresort.com/);
-    await page.getByRole('button', {name: 'Close guest information'}).click();
+  await footer.getByRole('link', {name: 'FAQ', exact: true}).click();
+  await expect(page).toHaveURL(/guest-information$/);
+  await page.getByText('How do I book a stay?', {exact: true}).click();
+  await expect(page.locator('.guest-faq').getByText(/Our team will confirm availability/)).toBeVisible();
+  for (const [label, slug] of [['Privacy policy', 'privacy-policy'], ['Terms & conditions', 'terms-and-conditions'], ['Cancellation & refunds', 'cancellation-refund-policy'], ['Cookies & preferences', 'cookie-policy']]) {
+    await footer.locator('.nest-footer-links').getByRole('link', {name: label, exact: true}).click();
+    await expect(page).toHaveURL(new RegExp(slug + '$'));
+    await expect(page.locator('.guest-document')).toBeVisible();
   }
   await footer.getByRole('button', {name: 'Book your escape', exact: true}).click();
   await expect(page.locator('.booking-modal')).toBeVisible();

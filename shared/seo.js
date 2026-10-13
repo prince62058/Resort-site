@@ -1,4 +1,5 @@
 import { resolveRoute, itemPath } from './content.js';
+import { documentBlocks } from './guest-pages.js';
 export function seoFor(content, pathname, origin) {
   const route = resolveRoute(content, pathname);
   const item = route?.item,
@@ -10,7 +11,7 @@ export function seoFor(content, pathname, origin) {
   const description = seo.description || item?.summary || item?.description || settings.defaultSeo.description;
   const schema = {
     '@context': 'https://schema.org',
-    '@type': route?.type === 'posts' ? 'BlogPosting' : 'WebPage',
+    '@type': route?.type === 'posts' ? 'BlogPosting' : item?.template === 'contact' ? 'ContactPage' : 'WebPage',
     name: seo.title || item?.name || settings.fullName,
     description,
     url: canonical,
@@ -75,5 +76,10 @@ export function initialMarkup(content, route) {
     body = content.heroSlides[0].description;
     links = content.rooms.filter(r => r.featured).map(r => `<p><a href="${e(itemPath(content, 'rooms', r))}">${e(r.name)}</a></p>`).join('');
   }
-  return `<div class="initial-content"><nav>${nav}</nav><main><h1>${e(item.name)}</h1>${body.split('\n\n').map(p => '<p>' + e(p) + '</p>').join('')}${links}</main></div>`;
+  const formatted = ['legal', 'support'].includes(template);
+  const markup = formatted ? documentBlocks(body, content.settings).map(b => b.type === 'ul' ? '<ul>' + b.items.map(t => '<li>' + e(t) + '</li>').join('') + '</ul>' : `<${b.type}${b.id ? ' id="' + b.id + '"' : ''}>${e(b.text)}</${b.type}>`).join('') : body.split('\n\n').map(p => '<p>' + e(p) + '</p>').join('');
+  if (template === 'support') links += content.faqs.map(f => `<section><h2>${e(f.question)}</h2><p>${e(f.answer)}</p></section>`).join('');
+  if (template === 'contact' || formatted) links += `<address>${e(content.settings.address)}<br><a href="tel:+${e(content.settings.phoneDigits)}">${e(content.settings.phoneInternational)}</a><br><a href="mailto:${e(content.settings.email)}">${e(content.settings.email)}</a></address>`;
+  const guestLinks = content.pages.filter(p => p.footerGroup === 'help').map(p => `<a href="${e(itemPath(content, 'pages', p))}">${e(p.footerLabel || p.name)}</a>`).join(' · ');
+  return `<div class="initial-content"><nav>${nav}</nav><main><h1>${e(item.name)}</h1>${markup}${links}</main><footer>${guestLinks}</footer></div>`;
 }

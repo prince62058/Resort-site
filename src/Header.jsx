@@ -20,7 +20,7 @@ export default function Header({
   const header = useRef(null);
   const toggle = useRef(null);
   const route = resolveRoute(site, pathname);
-  const hasHero = Boolean(route && route.type !== 'rooms');
+  const hasHero = Boolean(route && route.type !== 'rooms' && !['legal', 'support'].includes(route.item.template));
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 45);
     onScroll();

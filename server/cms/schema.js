@@ -35,7 +35,9 @@ const page = z.object({
   heading: text,
   accent: text,
   subtitle: text,
-  template: z.enum(['home', 'rooms', 'services', 'galleries', 'about', 'contact', 'blog', 'custom']),
+  template: z.enum(['home', 'rooms', 'services', 'galleries', 'about', 'contact', 'blog', 'custom', 'legal', 'support']),
+  footerGroup: z.enum(['main', 'help', 'hidden']).default('main'),
+  updated: z.string().regex(/^(?:\d{4}-\d{2}-\d{2})?$/).default(''),
   nav: z.boolean(),
   body: z.string().max(50000),
   images

@@ -17,7 +17,7 @@ Never commit `.env`, prefix credentials with `VITE_`, or place the setup token i
 - **Pages & SEO**: built-in pages and additional pages; page titles, text, hero photographs, navigation labels, URL slugs, SEO titles/descriptions, planning keywords, share images and noindex.
 - **Stays**: add, edit or remove rooms/villas, starting rates, amenities, descriptions, cover/slideshow images and homepage features.
 - **Experiences / Galleries / Journal**: manage content, images, publishing status, order and SEO. Journal content supports plain-text paragraphs separated by a blank line.
-- **Banners & sections**: homepage, stays and story carousels, image sequences, comfort links and FAQs. Use **Website copy** for the text in the existing designed sections (216 editable fields). Some captions assembled from room types/counts remain derived from their data.
+- **Banners & sections**: homepage, stays and story carousels, image sequences, comfort links and FAQs. Use **Website copy** for the text in the existing designed sections and guest notices. Some captions assembled from room types/counts remain derived from their data.
 - **Media library**: browse the existing folder groups and upload raster images to `uploads/<folder>/`. Uploads are limited to 12 MB / 40 megapixels, re-encoded to WebP with a maximum edge of 2560 px and stripped of metadata. Existing resort originals are preserved. Unused new uploads can be deleted; referenced images cannot.
 - **Guest enquiries**: contact, reservation and newsletter requests are saved in MongoDB. Track new/in-progress/closed status and private follow-up notes. This does not confirm bookings, send emails, deliver newsletters or collect payments. Guests can continue their reservation conversation on WhatsApp.
 - **Version history**: restore a previous draft, review and save/publish it.
@@ -31,7 +31,15 @@ SEO metadata, Open Graph tags, JSON-LD and an initial content summary are includ
 
 ## Storage and security
 
-MongoDB collections: `cms_content`, `cms_users`, `cms_sessions`, `cms_limits`, `cms_revisions`, `cms_enquiries`, plus the existing media catalog/GridFS bucket. The current website is seeded once using `$setOnInsert`; restarts and deployments never overwrite saved CMS edits. Keep MongoDB backups enabled according to your hosting needs.
+MongoDB collections: `cms_content`, `cms_users`, `cms_sessions`, `cms_limits`, `cms_revisions`, `cms_enquiries`, plus the existing media catalog/GridFS bucket. The current website is seeded once using `$setOnInsert`. The guest-information upgrade adds only missing default pages and notice copy, preserves draft and published edits independently, and records a migration marker and revision. Later restarts do not restore pages an owner intentionally removes. Keep MongoDB backups enabled according to your hosting needs.
+
+## Guest information and policies
+
+**Pages & SEO** contains Privacy policy, Terms & conditions, Cancellation & refunds, Cookies & preferences and Guest information. All have editable slugs, SEO fields, text, update dates and footer placement. Keep them in **Here to help** to maintain the compact footer. Their content also appears in the server-rendered HTML and sitemap. Privacy links on forms follow the page's stable ID when its slug changes.
+
+Use `## Heading`, `### Subheading`, blank lines between paragraphs and `- List item` in policy content. Raw HTML is rendered as text. `{{resortName}}`, `{{email}}`, `{{phone}}` and `{{address}}` insert current values from **Site settings**. FAQ answers on the guest guide come from **Banners & sections**. Form notice labels and descriptions appear under `guest.*` in **Website copy**.
+
+No fixed check-in/out times, cancellation fees, refund deadlines or designated grievance officer have been supplied. The initial pages direct guests to their booking confirmation and resort team for those details. Add confirmed business rules when available and update the displayed date. The privacy/cookie text reflects the implemented enquiry forms, MongoDB storage, external fonts, outbound map/WhatsApp links and essential admin sessions; update it if tracking, payments, communication providers or data handling change. The public forms do not enrol contact or reservation enquirers into marketing. Newsletter requests are separate and include an email unsubscribe link.
 
 Passwords use salted scrypt hashes. Sessions use random opaque tokens (only hashes in the database), expire after 8 hours and use HttpOnly, SameSite=Strict cookies, plus Secure cookies in production. Mutations require session-bound CSRF tokens and same-origin headers. Login/setup and enquiries have database-backed rate limits. Content is schema-validated and rendered as text; image uploads are authenticated and decoded/re-encoded. Admin pages are noindex. The production app trusts one reverse-proxy hop, matching a single managed hosting proxy; adjust that setting if deploying behind a different proxy topology.
 
