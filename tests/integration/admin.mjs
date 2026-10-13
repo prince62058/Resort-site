@@ -4,30 +4,40 @@ import {guestPageIds} from '../../shared/guest-pages.js';
 import {migrateGuestPages} from '../../server/cms/migrations.js';
 import assert from 'node:assert/strict';
 import {randomBytes} from 'node:crypto';
-import {mkdir} from 'node:fs/promises';
+import {mkdir,mkdtemp,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
 import {MongoClient,GridFSBucket} from 'mongodb';
 import sharp from 'sharp';
 import {chromium} from '@playwright/test';
+import {createServer as createViteServer} from 'vite';
+import viteConfig from '../../vite.config.js';
 import {createApp} from '../../server/app.js';
 import '../../server/database.js';
 const client=new MongoClient(process.env.MONGODB_URI,{serverSelectionTimeoutMS:10000});
 const dbName='nature_nest_cms_test_'+Date.now();
 const token=randomBytes(32).toString('hex'),password=randomBytes(24).toString('hex'),email='cms-test@example.test';
-let server,browser;
+let server,browser,devServer,devCache;
 try {
  await client.connect();const db=client.db(dbName);const store={db,assets:db.collection('media_assets'),files:db.collection('resort_media.files'),bucket:new GridFSBucket(db,{bucketName:'resort_media'})};
  const original=structuredClone(seed);original.pages=original.pages.filter(p=>!guestPageIds.includes(p.id));original.posts=original.posts.filter(p=>!journalPostIds.includes(p.id));original.pages.find(p=>p.template==='blog').nav=false;const pending=structuredClone(original);pending.rooms[0].summary='Pending owner draft';
  await db.collection('cms_content').insertOne({_id:'site',version:1,draft:pending,published:original,redirects:{},updatedAt:new Date(),publishedAt:new Date()});
  server=createApp({getStore:async()=>store,configured:()=>true,authOptions:{setupToken:()=>token,production:()=>false}}).listen(0,'127.0.0.1');await new Promise(r=>server.once('listening',r));const base='http://127.0.0.1:'+server.address().port;
+ // Exercise the same proxy and browser Origin headers as npm run dev.
+ devCache=await mkdtemp(join(tmpdir(),'nature-nest-vite-test-'));
+ const proxy=Object.fromEntries(Object.entries(viteConfig.server.proxy).map(([route,options])=>[route,typeof options==='string'?base:{...options,target:base}]));
+ devServer=await createViteServer({...viteConfig,configFile:false,cacheDir:devCache,logLevel:'error',server:{...viteConfig.server,host:'127.0.0.1',port:0,strictPort:true,hmr:false,proxy}});
+ await devServer.listen();const devBase='http://127.0.0.1:'+devServer.httpServer.address().port;
  let cookie='',csrf='';
  async function request(path,{method='GET',body,headers={},auth=true,raw=false,redirect='follow'}={}) {
-  const response=await fetch(base+path,{method,headers:{...(auth?{Cookie:cookie,'X-CSRF-Token':csrf}:{}),'X-CMS-Request':'1',...(body&&!raw?{'Content-Type':'application/json'}:{}),...headers},body:body?(raw?body:JSON.stringify(body)):undefined,redirect});
+  const response=await fetch(devBase+path,{method,headers:{...(auth?{Cookie:cookie,'X-CSRF-Token':csrf}:{}),'X-CMS-Request':'1',Origin:devBase,...(body&&!raw?{'Content-Type':'application/json'}:{}),...headers},body:body?(raw?body:JSON.stringify(body)):undefined,redirect});
   const json=response.headers.get('content-type')?.includes('json')?await response.json():null;return {response,json};
  }
  assert.equal((await request('/api/admin/content',{auth:false})).response.status,401);
  assert.equal((await request('/api/admin/setup',{method:'POST',body:{email,password,setupToken:'wrong'}})).response.status,403);
  let result=await request('/api/admin/setup',{method:'POST',body:{email,password,setupToken:token}});assert.equal(result.response.status,200);
  cookie=result.response.headers.get('set-cookie').split(';')[0];csrf=result.json.csrf;assert.match(result.response.headers.get('set-cookie'),/HttpOnly/);assert.match(result.response.headers.get('set-cookie'),/SameSite=Strict/);
+ assert.equal((await request('/api/admin/login',{method:'POST',body:{email,password},headers:{Origin:'https://untrusted.test','X-Forwarded-Host':'untrusted.test'}})).response.status,403);
  assert.equal((await request('/api/admin/setup',{method:'POST',body:{email,password,setupToken:token}})).response.status,409);
  let doc=(await request('/api/admin/content')).json;
  assert.equal(doc.content.rooms[0].summary,'Pending owner draft');assert.equal(doc.content.pages.length,12);assert.equal(doc.content.posts.length,4);assert.equal(doc.content.pages.find(p=>p.template==='blog').nav,true);assert.equal((await request('/api/content')).json.content.rooms.find(r=>r.id===original.rooms[0].id).summary,original.rooms[0].summary);
@@ -60,7 +70,7 @@ try {
  assert.equal((await request('/api/admin/enquiries')).json.items[0].name,'Integration Guest');
  assert.equal((await request('/api/admin/enquiries/'+enquiry.json.id,{method:'PATCH',body:{status:'in-progress',notes:'Follow up tomorrow'}})).response.status,200);
  browser=await chromium.launch({channel:'chrome'});const page=await browser.newPage({viewport:{width:1440,height:1050}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
- await page.goto(base+'/admin/');await page.getByLabel('Email address',{exact:false}).fill(email);await page.getByLabel('Password',{exact:false}).fill(password);await page.getByRole('button',{name:'Sign in',exact:true}).click();await page.getByRole('heading',{name:'A little care. A better stay.'}).waitFor();
+ await page.goto(devBase+'/admin/');await page.getByLabel('Email address',{exact:false}).fill(email);await page.getByLabel('Password',{exact:false}).fill(password);await page.getByRole('button',{name:'Sign in',exact:true}).click();await page.getByRole('heading',{name:'A little care. A better stay.'}).waitFor();
  await mkdir('output/admin',{recursive:true});await page.screenshot({path:'output/admin/dashboard-desktop.png',fullPage:true});
  await page.getByRole('navigation').getByRole('button',{name:'Stays',exact:true}).click();await page.getByRole('button',{name:/Garden Villa Test/}).click();await page.getByLabel('Name / title').fill('Updated in Admin UI');await page.getByLabel('URL slug',{exact:true}).fill('premium-');await page.getByLabel('URL slug',{exact:true}).pressSequentially('garden-villa-mhow');assert.equal(await page.getByLabel('URL slug',{exact:true}).inputValue(),'premium-garden-villa-mhow');await page.getByLabel('Focus keywords').fill('resort, mhow');await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.getByRole('status').filter({hasText:'Draft saved'}).waitFor();
  assert.ok(!(await request('/api/content')).json.content.rooms.some(r=>r.name==='Updated in Admin UI'));
@@ -84,10 +94,14 @@ try {
  const newPassword=randomBytes(24).toString('hex');result=await request('/api/admin/password',{method:'POST',body:{currentPassword:password,password:newPassword}});assert.equal(result.response.status,200);
  assert.equal((await request('/api/admin/session')).response.status,401);
  assert.equal((await request('/api/admin/login',{method:'POST',body:{email,password}})).response.status,401);
- assert.equal((await request('/api/admin/login',{method:'POST',body:{email,password:newPassword}})).response.status,200);
+ result=await request('/api/admin/login',{method:'POST',body:{email,password:newPassword}});assert.equal(result.response.status,200);
+ cookie=result.response.headers.get('set-cookie').split(';')[0];csrf=result.json.csrf;
+ assert.equal((await request('/api/admin/logout',{method:'POST'})).response.status,200);
+ assert.equal((await request('/api/admin/session')).response.status,401);
  let rateLimited=false;for(let i=0;i<25;i++){const r=await request('/api/admin/login',{method:'POST',body:{email:'invalid@example.test',password:'wrong-password-test'}});if(r.response.status===429){rateLimited=true;break;}}assert.ok(rateLimited);
- console.log('PASS: owner setup, authentication, CSRF, draft/publish, stale edits, SEO HTML, redirects, sitemap, uploads, protected enquiries, responsive admin UI, persistence and password session revocation.');
+ console.log('PASS: dev-proxy owner setup, browser login, origin and CSRF protection, draft/publish, stale edits, SEO HTML, redirects, sitemap, uploads, protected enquiries, responsive admin UI, persistence, password session revocation and logout.');
 } finally {
- await browser?.close();if(server)await new Promise(r=>server.close(r));
+ await browser?.close();await devServer?.close();if(server)await new Promise(r=>server.close(r));
+ if(devCache)await rm(devCache,{recursive:true,force:true});
  if(dbName.startsWith('nature_nest_cms_test_'))await client.db(dbName).dropDatabase();await client.close();
 }
