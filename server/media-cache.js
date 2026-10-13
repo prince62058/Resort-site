@@ -11,6 +11,7 @@ export function createMediaCache(root, {maxBytes = 32 * 1024 * 1024, ttl = 60000
   const pendingMetadata = new Map();
   let bytes = 0;
   return {
+    async invalidate(filename) {await pendingMetadata.get(filename);catalog.delete(filename);},
     async metadata(filename, assets) {
       const existing = catalog.get(filename);
       if (existing && existing.expires > Date.now()) return existing.value;

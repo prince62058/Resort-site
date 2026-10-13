@@ -1,0 +1,75 @@
+import assert from 'node:assert/strict';
+import {randomBytes} from 'node:crypto';
+import {mkdir} from 'node:fs/promises';
+import {MongoClient,GridFSBucket} from 'mongodb';
+import sharp from 'sharp';
+import {chromium} from '@playwright/test';
+import {createApp} from '../../server/app.js';
+import '../../server/database.js';
+const client=new MongoClient(process.env.MONGODB_URI,{serverSelectionTimeoutMS:10000});
+const dbName='nature_nest_cms_test_'+Date.now();
+const token=randomBytes(32).toString('hex'),password=randomBytes(24).toString('hex'),email='cms-test@example.test';
+let server,browser;
+try {
+ await client.connect();const db=client.db(dbName);const store={db,assets:db.collection('media_assets'),files:db.collection('resort_media.files'),bucket:new GridFSBucket(db,{bucketName:'resort_media'})};
+ server=createApp({getStore:async()=>store,configured:()=>true,authOptions:{setupToken:()=>token,production:()=>false}}).listen(0,'127.0.0.1');await new Promise(r=>server.once('listening',r));const base='http://127.0.0.1:'+server.address().port;
+ let cookie='',csrf='';
+ async function request(path,{method='GET',body,headers={},auth=true,raw=false,redirect='follow'}={}) {
+  const response=await fetch(base+path,{method,headers:{...(auth?{Cookie:cookie,'X-CSRF-Token':csrf}:{}),'X-CMS-Request':'1',...(body&&!raw?{'Content-Type':'application/json'}:{}),...headers},body:body?(raw?body:JSON.stringify(body)):undefined,redirect});
+  const json=response.headers.get('content-type')?.includes('json')?await response.json():null;return {response,json};
+ }
+ assert.equal((await request('/api/admin/content',{auth:false})).response.status,401);
+ assert.equal((await request('/api/admin/setup',{method:'POST',body:{email,password,setupToken:'wrong'}})).response.status,403);
+ let result=await request('/api/admin/setup',{method:'POST',body:{email,password,setupToken:token}});assert.equal(result.response.status,200);
+ cookie=result.response.headers.get('set-cookie').split(';')[0];csrf=result.json.csrf;assert.match(result.response.headers.get('set-cookie'),/HttpOnly/);assert.match(result.response.headers.get('set-cookie'),/SameSite=Strict/);
+ assert.equal((await request('/api/admin/setup',{method:'POST',body:{email,password,setupToken:token}})).response.status,409);
+ let doc=(await request('/api/admin/content')).json;
+ let c=structuredClone(doc.content);const room=c.rooms[0],oldSlug=room.slug;room.slug='seo-test-garden-villa';room.name='Garden Villa Test';room.seo.title='Garden Villa near Indore | Test';room.seo.description='A quiet garden villa for a relaxed stay in Mhow, near Indore.';c.settings.siteUrl=base;
+ const saveBody={content:c,version:doc.version,publish:false};
+ assert.equal((await request('/api/admin/content',{method:'PUT',body:saveBody,headers:{'X-CSRF-Token':''}})).response.status,403);
+ assert.equal((await request('/api/admin/content',{method:'PUT',body:saveBody,headers:{Origin:'https://untrusted.test'}})).response.status,403);
+ result=await request('/api/admin/content',{method:'PUT',body:saveBody});assert.equal(result.response.status,200);doc=result.json;
+ assert.ok((await request('/api/content')).json.content.rooms.some(r=>r.slug===oldSlug));
+ result=await request('/api/admin/content',{method:'PUT',body:{content:c,version:doc.version,publish:true}});assert.equal(result.response.status,200);doc=result.json;
+ assert.equal((await request('/api/admin/content',{method:'PUT',body:{content:c,version:1,publish:true}})).response.status,409);
+ const custom={...structuredClone(c.pages[0]),id:'weekend-retreat',slug:'weekend-retreat-mhow',name:'Weekend retreat in Mhow',template:'custom',heading:'Your weekend retreat',body:'A quiet weekend with your favourite people.',footerLabel:'Weekend retreat',nav:true,order:20};c.pages.push(custom);doc=(await request('/api/admin/content',{method:'PUT',body:{content:c,version:doc.version,publish:true}})).json;
+ const published=(await request('/api/content')).json;assert.ok(published.content.rooms.some(r=>r.name==='Garden Villa Test'));
+ const redir=await fetch(base+'/rooms/'+oldSlug,{redirect:'manual'});assert.equal(redir.status,301);assert.equal(redir.headers.get('location'),'/rooms/seo-test-garden-villa');
+ const html=await (await fetch(base+'/rooms/seo-test-garden-villa')).text();assert.match(html,/<title>Garden Villa near Indore \| Test<\/title>/);assert.match(html,/<h1>Garden Villa Test<\/h1>/);assert.match(html,/application\/ld\+json/);assert.match(await (await fetch(base+'/sitemap.xml')).text(),/seo-test-garden-villa/);assert.equal((await fetch(base+'/unpublished-test-page')).status,404);
+ assert.equal((await request('/api/admin/media?folder=test&name=fake.png',{method:'POST',body:Buffer.from('not an image'),raw:true,headers:{'Content-Type':'image/png'}})).response.status,400);
+ const png=await sharp({create:{width:64,height:64,channels:3,background:'#395838'}}).png().toBuffer();
+ const uploaded=await request('/api/admin/media?folder=test&name=garden.png',{method:'POST',body:png,raw:true,headers:{'Content-Type':'image/png'}});assert.equal(uploaded.response.status,201);
+ assert.equal((await fetch(base+uploaded.json.url)).headers.get('content-type'),'image/webp');
+ c=structuredClone(doc.content);c.heroSlides[0].image=uploaded.json.path;
+ doc=(await request('/api/admin/content',{method:'PUT',body:{content:c,version:doc.version,publish:false}})).json;
+ assert.equal((await request('/api/admin/media',{method:'DELETE',body:{path:uploaded.json.path}})).response.status,409);
+ assert.equal((await request('/api/admin/enquiries',{auth:false})).response.status,401);
+ const enquiry=await request('/api/enquiries',{method:'POST',auth:false,body:{type:'contact',name:'Integration Guest',email:'guest@example.test',message:'A test enquiry'}});assert.equal(enquiry.response.status,201);
+ assert.equal((await request('/api/admin/enquiries')).json.items[0].name,'Integration Guest');
+ assert.equal((await request('/api/admin/enquiries/'+enquiry.json.id,{method:'PATCH',body:{status:'in-progress',notes:'Follow up tomorrow'}})).response.status,200);
+ browser=await chromium.launch({channel:'chrome'});const page=await browser.newPage({viewport:{width:1440,height:1050}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(base+'/admin/');await page.getByLabel('Email address',{exact:false}).fill(email);await page.getByLabel('Password',{exact:false}).fill(password);await page.getByRole('button',{name:'Sign in',exact:true}).click();await page.getByRole('heading',{name:'A little care. A better stay.'}).waitFor();
+ await mkdir('output/admin',{recursive:true});await page.screenshot({path:'output/admin/dashboard-desktop.png',fullPage:true});
+ await page.getByRole('navigation').getByRole('button',{name:'Stays',exact:true}).click();await page.getByRole('button',{name:/Garden Villa Test/}).click();await page.getByLabel('Name / title').fill('Updated in Admin UI');await page.getByLabel('URL slug',{exact:true}).fill('premium-');await page.getByLabel('URL slug',{exact:true}).pressSequentially('garden-villa-mhow');assert.equal(await page.getByLabel('URL slug',{exact:true}).inputValue(),'premium-garden-villa-mhow');await page.getByLabel('Focus keywords').fill('resort, mhow');await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.getByRole('status').filter({hasText:'Draft saved'}).waitFor();
+ assert.ok(!(await request('/api/content')).json.content.rooms.some(r=>r.name==='Updated in Admin UI'));
+ await page.getByRole('button',{name:'Publish changes'}).click();await page.getByRole('status').filter({hasText:'Published.'}).waitFor();
+ await page.screenshot({path:'output/admin/stay-editor-desktop.png',fullPage:true});
+ assert.ok((await request('/api/content')).json.content.rooms.some(r=>r.name==='Updated in Admin UI'));
+ const publicPage=await browser.newPage();await publicPage.goto(base+'/rooms/premium-garden-villa-mhow');await publicPage.getByRole('heading',{name:'Updated in Admin UI',exact:true}).waitFor();await publicPage.goto(base+'/weekend-retreat-mhow');await publicPage.getByRole('heading',{name:'Your weekend retreat',exact:true}).waitFor();assert.ok(await publicPage.getByText('A quiet weekend with your favourite people.',{exact:true}).isVisible());await publicPage.close();
+ await page.reload();await page.getByRole('heading',{name:'A little care. A better stay.'}).waitFor();
+ await page.setViewportSize({width:390,height:844});await page.getByRole('button',{name:'Open navigation',exact:true}).click();await page.getByRole('navigation').getByRole('button',{name:'Pages & SEO',exact:true}).click();await page.screenshot({path:'output/admin/pages-mobile.png',fullPage:true});
+ assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ await page.getByRole('button',{name:/Home.*SEO details added/}).click();await page.screenshot({path:'output/admin/editor-mobile.png',fullPage:true});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ await page.getByRole('button',{name:'Choose image',exact:true}).click();await page.getByRole('dialog').waitFor();await page.screenshot({path:'output/admin/media-mobile.png',fullPage:true});assert.ok(await page.getByRole('dialog').evaluate(el=>el.scrollWidth<=el.clientWidth+1));await page.getByRole('button',{name:/Select garden-/}).click();await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.getByRole('status').filter({hasText:'Draft saved'}).waitFor();
+ for(const width of [320,390,768,1024,1440]){await page.setViewportSize({width,height:900});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Admin overflow at '+width);}
+ assert.deepEqual(errors,[]);
+ const newPassword=randomBytes(24).toString('hex');result=await request('/api/admin/password',{method:'POST',body:{currentPassword:password,password:newPassword}});assert.equal(result.response.status,200);
+ assert.equal((await request('/api/admin/session')).response.status,401);
+ assert.equal((await request('/api/admin/login',{method:'POST',body:{email,password}})).response.status,401);
+ assert.equal((await request('/api/admin/login',{method:'POST',body:{email,password:newPassword}})).response.status,200);
+ let rateLimited=false;for(let i=0;i<25;i++){const r=await request('/api/admin/login',{method:'POST',body:{email:'invalid@example.test',password:'wrong-password-test'}});if(r.response.status===429){rateLimited=true;break;}}assert.ok(rateLimited);
+ console.log('PASS: owner setup, authentication, CSRF, draft/publish, stale edits, SEO HTML, redirects, sitemap, uploads, protected enquiries, responsive admin UI, persistence and password session revocation.');
+} finally {
+ await browser?.close();if(server)await new Promise(r=>server.close(r));
+ if(dbName.startsWith('nature_nest_cms_test_'))await client.db(dbName).dropDatabase();await client.close();
+}

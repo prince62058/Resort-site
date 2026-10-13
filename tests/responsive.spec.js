@@ -1,4 +1,5 @@
 import {test, expect} from '@playwright/test';
+test.beforeEach(async({page})=>{await page.route('**/api/enquiries',route=>route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({ok:true,id:'ui-test'})}));});
 
 test.use({viewport: {width: 320, height: 568}, reducedMotion: 'reduce', hasTouch: true, isMobile: true});
 const base = 'http://localhost:5173';
@@ -24,7 +25,7 @@ test('every hero slide fits above touch controls on narrow phones', async ({page
 async function expectFieldsToFit(container) {
   const issues = await container.evaluate(root => {
     const bounds = root.getBoundingClientRect();
-    return [...root.querySelectorAll('input, select, textarea')].flatMap(input => {
+    return [...root.querySelectorAll('input:not([aria-hidden="true"]), select, textarea')].flatMap(input => {
       const rect = input.getBoundingClientRect();
       const style = getComputedStyle(input);
       return rect.left < bounds.left || rect.right > bounds.right + 1 || rect.width < 200 ||
@@ -50,7 +51,8 @@ test('small-phone search and reservation remain usable after rotation', async ({
   await expect(booking.locator('[name="out"]')).toHaveValue('2027-06-12');
   await expect(booking.locator('[name="guests"]')).toHaveValue('4');
   await booking.getByLabel('Your name', {exact: true}).fill('Mobile Guest');
-  await booking.getByRole('button', {name: 'Prepare reservation enquiry'}).click();
+  await booking.getByLabel('Phone number', {exact: true}).fill('9876543210');
+  await booking.getByRole('button', {name: 'Send reservation enquiry'}).click();
   await expect(booking.getByRole('link', {name: 'Continue on WhatsApp'})).toHaveAttribute('href', /Mobile%20Guest/);
   await page.setViewportSize({width: 568, height: 320});
   await expectFieldsToFit(booking);
@@ -107,9 +109,9 @@ test('contact form prepares enquiry with readable fields on the smallest layout'
   await form.getByLabel('Email address').fill('guest@example.com');
   await form.getByLabel('Phone number').fill('9876543210');
   await form.getByLabel('What do you have in mind?').fill('Please help plan a weekend stay.');
-  await form.getByRole('button', {name: 'Prepare enquiry'}).click();
-  await expect(form.getByRole('status')).toContainText('Your enquiry is ready.');
-  await expect(form.getByRole('link')).toHaveAttribute('href', /mailto:info@thenaturenestresort.com.*Mobile%20Guest/);
+  await form.getByRole('button', {name: 'Send enquiry'}).click();
+  await expect(form.getByRole('status')).toContainText('Your enquiry has been sent');
+  await expect(form.getByLabel('Your name')).toHaveValue('');
 });
 
 test('landscape gallery reserves room for controls and supports touch swipes', async ({page}) => {

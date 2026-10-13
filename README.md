@@ -91,14 +91,19 @@ The Express server serves the built React app and supports direct links such as 
 - Date-validated reservation enquiries prepared for WhatsApp, and contact enquiries prepared for email.
 - Original blog content, resort photographs and contact information.
 
-## Other service integrations
+## Admin studio and dynamic content
 
-MongoDB currently stores the image library. Booking, payment, account and email systems are not added by this integration. Enquiries open WhatsApp or the visitor's email app; they are not confirmed bookings. Account URLs lead to guest assistance. Rates require confirmation by the resort.
+Open `/admin/` for the separate React admin application in [admin/](admin/README.md). Manage pages/slugs/SEO, stays, experiences, galleries, journal posts, banners, website copy, logos/icons, contact details, media uploads and guest enquiries. Drafts and published content live in MongoDB; slug changes create redirects, and the server generates page metadata, `/sitemap.xml` and `/robots.txt`.
+
+Run `npm run admin:setup-token` to create the private first-account token, add it as `ADMIN_SETUP_TOKEN` in Hostinger, and create your own owner login at `/admin/`. Set `NODE_ENV=production` and use HTTPS in production. After signing in, set the final domain under **Site settings → Live website URL**. See [admin/README.md](admin/README.md) for the complete setup and recovery guide.
+
+Contact, reservation and newsletter forms now save requests to the admin inbox. Reservation requests can also continue on WhatsApp. This is an enquiry workflow, not confirmed inventory, a payment gateway, automatic email delivery or a newsletter sending service.
 
 ## Verification
 
 ```sh
 npm run test:server
+npm run test:admin
 npm test
 npm run test:mobile
 npm run media:verify

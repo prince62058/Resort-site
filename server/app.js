@@ -6,14 +6,23 @@ import {pipeline} from 'node:stream/promises';
 import {databaseConfigured, getMediaStore} from './database.js';
 import {imageType, mediaUrl, validMediaPath} from './media-paths.js';
 import {createMediaCache} from './media-cache.js';
+import {createContentStore} from './cms/store.js';
+import {createCmsRouter, createEnquiryRouter} from './cms/router.js';
+import {installSeo} from './cms/seo.js';
 
 const project = fileURLToPath(new URL('../', import.meta.url));
 
-export function createApp({getStore = getMediaStore, configured = databaseConfigured, root = project} = {}) {
+export function createApp({getStore = getMediaStore, configured = databaseConfigured, root = project, cms: suppliedCms, authOptions} = {}) {
   const app = express();
   const cache = createMediaCache(path.join(root, 'public/assets'));
   app.disable('x-powered-by');
-  app.use((req, res, next) => {res.set('X-Content-Type-Options', 'nosniff'); next();});
+  app.use((req,res,next)=>{res.set({'X-Content-Type-Options':'nosniff','Referrer-Policy':'strict-origin-when-cross-origin','X-Frame-Options':'SAMEORIGIN'});next();});
+  if(process.env.NODE_ENV === 'production') app.set('trust proxy', 1);
+  const cms = suppliedCms || createContentStore(getStore, configured);
+  app.get('/api/content', async (req,res) => {res.set('Cache-Control','no-cache').json(await cms.published());});
+  app.use('/api/admin', createCmsRouter(cms,getStore,authOptions,filename=>cache.invalidate(filename)));
+  app.use('/api/enquiries', createEnquiryRouter(cms));
+
 
   app.get('/api/health', async (req, res) => {
     res.set('Cache-Control', 'no-store');
@@ -97,17 +106,20 @@ export function createApp({getStore = getMediaStore, configured = databaseConfig
   app.use('/assets', (req, res, next) => {res.set('X-Media-Source', 'local'); next();},
     express.static(path.join(root, 'public/assets'), {dotfiles: 'deny', index: false, maxAge: '1h'}));
   app.use('/api', (req, res) => res.status(404).json({error: 'Not found.'}));
+  app.get(/^\/admin(?:\/.*)?$/, (req,res) => {res.set({'X-Robots-Tag':'noindex, nofollow','Cache-Control':'no-store'}).sendFile(path.join(root,'dist/admin/index.html'));});
+  const seoHandler=installSeo(app,cms,root);
   app.use(express.static(path.join(root, 'dist'), {dotfiles: 'deny', index: false}));
   app.use('/assets', (req, res) => res.status(404).end());
-  app.get(/.*/, (req, res) => {
+  app.get(/.*/, (req, res, next) => {
     const index = path.join(root, 'dist/index.html');
-    if (existsSync(index)) return res.sendFile(index);
+    if (existsSync(index)) return seoHandler(req,res,next);
     res.status(503).send('Run npm run build, or open the Vite development server.');
   });
   app.use((error, req, res, next) => {
     if (res.headersSent) return next(error);
     // Do not return database errors, URIs or credentials to a public client.
-    res.set('Cache-Control', 'no-store').status(error instanceof URIError ? 400 : 503).json({error: error instanceof URIError ? 'Invalid path.' : 'Media service temporarily unavailable.'});
+    const status=error.status || (error instanceof URIError ? 400 : 503);
+    res.set('Cache-Control','no-store').status(status).json({error:error instanceof URIError?'Invalid path.':status<500?error.message:'Service temporarily unavailable. Please try again.'});
   });
   return app;
 }

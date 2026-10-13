@@ -1,4 +1,5 @@
 import {test,expect} from '@playwright/test';
+test.beforeEach(async({page})=>{await page.route('**/api/enquiries',route=>route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({ok:true,id:'ui-test'})}));});
 test('pages, original assets and enquiry journey',async({page})=>{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto('http://localhost:5173');
@@ -15,9 +16,10 @@ test('pages, original assets and enquiry journey',async({page})=>{
  await expect(page.locator('.detail-image>span')).toContainText('2 /');
  await page.getByRole('button',{name:'Enquire about this stay'}).click();
  await page.getByLabel('Your name',{exact:true}).fill('Test Guest');
+ await page.getByLabel('Phone number',{exact:true}).fill('9876543210');
  await page.locator('[name="in"]').fill('2027-01-10');
  await page.locator('[name="out"]').fill('2027-01-12');
- await page.getByRole('button',{name:'Prepare reservation enquiry'}).click();
+ await page.getByRole('button',{name:'Send reservation enquiry'}).click();
  await expect(page.getByRole('link',{name:'Continue on WhatsApp'})).toHaveAttribute('href',/wa.me.*Test%20Guest/);
  await page.getByRole('button',{name:'Close reservation'}).click();
  await page.goto('http://localhost:5173/galleries');

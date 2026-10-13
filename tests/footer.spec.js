@@ -1,4 +1,5 @@
 import {test, expect} from '@playwright/test';
+test.beforeEach(async({page})=>{await page.route('**/api/enquiries',route=>route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({ok:true,id:'ui-test'})}));});
 
 test('footer keeps resort information and provides working guest actions', async ({page}) => {
   await page.emulateMedia({reducedMotion: 'reduce'});
@@ -31,20 +32,19 @@ test('footer keeps resort information and provides working guest actions', async
   await expect(page).toHaveURL(/contact-us$/);
 });
 
-test('newsletter validates email and prepares an unsent request; mobile controls stay clear', async ({page}) => {
+test('newsletter validates email and sends a subscription request; mobile controls stay clear', async ({page}) => {
   await page.setViewportSize({width:390, height:844});
   await page.emulateMedia({reducedMotion:'reduce'});
   await page.goto('http://localhost:5173');
   const footer = page.getByRole('contentinfo');
   const email = footer.getByRole('textbox', {name:'Your email address'});
   await email.fill('invalid');
-  await footer.getByRole('button', {name:'Prepare newsletter request'}).click();
+  await footer.getByRole('button', {name:'Subscribe to newsletter'}).click();
   await expect(footer.getByRole('status')).toHaveCount(0);
   await email.fill('guest@example.com');
-  await footer.getByRole('button', {name:'Prepare newsletter request'}).click();
-  const send = footer.getByRole('link', {name:'Open email app to send'});
-  await expect(send).toHaveAttribute('href', /mailto:info@thenaturenestresort.com.*guest%40example.com/);
-  await expect(footer.getByRole('status')).toContainText('Your email request is ready.');
+  await footer.getByRole('button', {name:'Subscribe to newsletter'}).click();
+  await expect(email).toHaveValue('');
+  await expect(footer.getByRole('status')).toContainText('Your subscription request has been received.');
   await email.fill('another@example.com');
   await expect(footer.getByRole('status')).toHaveCount(0);
   const motion = footer.getByRole('button', {name:'Play all animations'});
