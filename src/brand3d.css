@@ -1,0 +1,93 @@
+.brand3d { display: inline-flex; align-items: center; gap: 9px; color: inherit; perspective: 600px; transition: transform .35s ease; }
+.brand3d .brand3d-mark, .site-header .nav-brand .brand3d .brand3d-mark { display: block; flex: 0 0 auto; width: 69px; height: 69px; object-fit: contain; filter: drop-shadow(0 5px 5px #071b1440); transform-origin: 50% 75%; transition: filter .4s ease; }
+.brand3d-wordmark { display: flex; flex-direction: column; align-items: flex-start; white-space: nowrap; }
+.brand3d-overline { font-family: 'DM Sans', sans-serif; font-size: 6px; letter-spacing: 2px; margin-bottom: 3px; }
+.brand3d-name { font-family: 'Playfair Display', Georgia, serif; font-size: 21px; letter-spacing: -.6px; line-height: 1.15; }
+.brand3d-caption { font-family: 'DM Sans', sans-serif; font-size: 5.5px; letter-spacing: 1.6px; margin-top: 6px; opacity: .75; }
+.brand3d.is-moving .brand3d-mark { animation: emblem-float 8s ease-in-out infinite; }
+.site-header .nav-brand { width: 200px; padding-top: 0; padding-bottom: 0; color: var(--nav-text); }
+.site-header .nav-brand:hover .brand3d { transform: translateY(-2px); }
+.site-header.is-scrolled .nav-brand .brand3d .brand3d-mark { width: 59px; height: 59px; }
+.site-header.is-scrolled .brand3d-name { font-size: 20px; }
+.site-header.is-scrolled .brand3d { gap: 10px; }
+.footer-brand .brand { width: 230px; }
+.footer-brand .brand3d .brand3d-mark { width: 84px; height: 84px; filter: drop-shadow(0 5px 8px #0b170b40); }
+.footer-brand .brand3d-name { font-size: 25px; }
+.footer-brand .brand3d-caption { font-size: 6px; }
+.sculpture { --sculpture-size: 96px; position: relative; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: var(--sculpture-size); height: var(--sculpture-size); perspective: 650px; isolation: isolate; transition: transform .4s ease; }
+.sculpture::before { content: ''; position: absolute; inset: 14%; border-radius: 50%; background: radial-gradient(ellipse, #bfcdaa30, transparent 70%); z-index: -1; }
+.sculpture img { display: block; width: 88%; height: 88%; object-fit: contain; filter: drop-shadow(0 7px 5px #28402a20); transform-origin: 50% 80%; }
+.sculpture.is-moving img { animation: sculpture-float 7s ease-in-out infinite; animation-delay: var(--sculpture-delay, 0s); }
+.sculpture-pool.is-moving img { animation-name: pool-float; }
+.sculpture-dining.is-moving img { animation-duration: 8s; }
+.sculpture-small { --sculpture-size: 43px; }
+.sculpture-tiny { --sculpture-size: 27px; }
+.comforts3d { max-width: 1380px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 40px auto 0; padding: 24px 0 30px; border-bottom: 1px solid #dae0cd; }
+.comfort3d { position: relative; text-align: center; padding: 10px 18px 15px; border-right: 1px solid #dce1d0; border-radius: 2px; transition: background .35s ease; }
+.comfort3d:last-child { border-right: 0; }
+.comfort3d .sculpture { --sculpture-size: 118px; margin-bottom: 10px; }
+.comfort3d h3 { font-size: 24px; margin: 12px 0 5px; color: #344b34; }
+.comfort3d p { font-size: 11px; margin: 0; color: #8b9380; }
+.comfort3d-arrow { position: absolute; right: 20px; top: 25px; color: #82966a; opacity: 0; transform: translate(-5px, 5px); transition: opacity .3s, transform .3s; }
+.comfort3d:hover, .comfort3d:focus-visible { background: #e9edde80; }
+.comfort3d:hover .sculpture, .comfort3d:focus-visible .sculpture { transform: translateY(-5px) rotateY(-8deg) scale(1.05); }
+.comfort3d:hover .comfort3d-arrow, .comfort3d:focus-visible .comfort3d-arrow { opacity: 1; transform: translate(0); }
+.search-title .sculpture { --sculpture-size: 46px; }
+.search-title { gap: 12px; }
+.experience-title > .sculpture { --sculpture-size: 64px; order: 0; }
+.experience-title { flex-wrap: wrap; }
+.experience-title > div { flex: 1; }
+.experience-title > .sculpture + div { min-width: 190px; }
+.sculpted-amenities { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 27px 0; }
+.sculpted-amenities > div { display: flex; align-items: center; gap: 10px; padding: 13px 10px; background: #eef0e5; border: 1px solid #e1e6d5; }
+.sculpted-amenities span:last-child { font-size: 11px; color: #4c6243; }
+.sculpted-amenities .sculpture { --sculpture-size: 53px; }
+.booking-modal .booking-emblem { --sculpture-size: 72px; display: flex; margin: 0 auto 20px; }
+.booking-modal > .eyebrow { justify-content: center; }
+.booking-modal > h2, .booking-modal > p { text-align: center; }
+.closing-note > .sculpture { --sculpture-size: 80px; display: flex; margin: 0 auto 18px; }
+.footer-invite > .sculpture { --sculpture-size: 63px; }
+@keyframes emblem-float { 0%,100% { transform: rotateY(-7deg) rotateZ(-1deg) translateY(0); } 50% { transform: rotateY(7deg) rotateZ(1deg) translateY(-3px); } }
+@keyframes sculpture-float { 0%,100% { transform: translateY(0) rotateZ(-2deg) rotateY(-6deg); } 50% { transform: translateY(-7px) rotateZ(2deg) rotateY(7deg); } }
+@keyframes pool-float { 0%,100% { transform: translateY(0) rotateZ(-2deg); } 50% { transform: translateY(-5px) rotateZ(2deg); } }
+@media (max-width: 1300px) { .comforts3d { margin-left: 5%; margin-right: 5%; } .comfort3d h3 { font-size: 21px; } }
+@media (max-width: 1200px) and (min-width: 1051px) {
+  .site-header .nav-brand { width: 162px; }
+  .site-header .nav-brand .brand3d .brand3d-mark { width: 54px; height: 54px; }
+  .brand3d-name { font-size: 18px; }
+  .brand3d-caption { font-size: 5px; letter-spacing: 1px; }
+  .brand3d { gap: 7px; }
+}
+@media (max-width: 1050px) { .site-header .nav-brand { width: 190px; } .sculpted-amenities { grid-template-columns: 1fr; } }
+@media (max-width: 750px) { .comforts3d { grid-template-columns: repeat(2, 1fr); row-gap: 20px; } .comfort3d:nth-child(2) { border-right: 0; } .comfort3d h3 { font-size: 22px; } }
+@media (max-width: 640px) {
+  .site-header .nav-brand { width: 132px; }
+  .site-header .nav-brand .brand3d .brand3d-mark, .site-header.is-scrolled .nav-brand .brand3d .brand3d-mark { width: 45px; height: 45px; }
+  .site-header .brand3d { gap: 6px; }
+  .site-header .brand3d-name, .site-header.is-scrolled .brand3d-name { font-size: 16px; letter-spacing: -.5px; }
+  .site-header .brand3d-overline { font-size: 5px; margin-bottom: 2px; letter-spacing: 1.5px; }
+  .site-header .brand3d-caption { font-size: 4px; letter-spacing: .8px; margin-top: 4px; }
+  .nav-inner { gap: 8px; }
+  .nav-actions { gap: 7px; }
+  .nav-book { padding-left: 10px; gap: 5px; font-size: 8px; }
+  .comforts3d { margin: 20px 5% 0; padding: 20px 0; row-gap: 18px; }
+  .comfort3d { padding: 4px 9px 14px; }
+  .comfort3d .sculpture { --sculpture-size: 92px; margin-bottom: 0; }
+  .comfort3d h3 { font-size: 19px; line-height: 1.35; }
+  .comfort3d p { font-size: 9px; line-height: 1.8; }
+  .comfort3d-arrow { top: 12px; right: 10px; }
+  .experience-title > .sculpture { --sculpture-size: 51px; }
+  .experience-title > .sculpture + div { min-width: 160px; }
+  .sculpted-amenities { grid-template-columns: 1fr; gap: 10px; }
+  .sculpted-amenities > div { padding: 10px 16px; }
+}
+@media (max-width: 360px) {
+  .site-header .nav-brand { width: 110px; }
+  .site-header .nav-brand .brand3d .brand3d-mark, .site-header.is-scrolled .nav-brand .brand3d .brand3d-mark { width: 37px; height: 37px; }
+  .site-header .brand3d-name, .site-header.is-scrolled .brand3d-name { font-size: 14px; }
+  .site-header .brand3d-caption { font-size: 3.5px; letter-spacing: .6px; }
+  .nav-book { font-size: 7.5px; padding-left: 8px; }
+  .nav-book-icon { width: 23px; }
+  .nav-toggle { width: 31px; height: 31px; }
+}
+@media (prefers-reduced-motion: reduce) { .brand3d, .brand3d.is-moving .brand3d-mark, .sculpture, .sculpture.is-moving img, .comfort3d, .comfort3d-arrow { animation: none; transition: none; } }

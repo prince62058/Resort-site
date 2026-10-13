@@ -1,0 +1,12 @@
+{
+  "tool": "built-in image_gen",
+  "mode": "edit",
+  "source": "public/assets/banners/banner-pool-1.jpg",
+  "output": "public/assets/enhanced/pool-regenerated-v1.png",
+  "webAsset": "public/assets/enhanced/pool-regenerated-v1.webp",
+  "dimensions": [
+    1536,
+    1024
+  ],
+  "prompt": "Use case: precise-object-edit.\nAsset type: large resort website swimming-pool photograph.\nInput image 1 is the edit target and factual visual reference: the existing Nature Nest resort pool.\nPrimary request: regenerate this low-resolution photograph as a crisp, natural, high-resolution architectural photograph of exactly the same pool and surroundings. Restore believable detail without redesigning the property.\nPreserve the same freeform blue mosaic-tiled swimming pool, the small round shallow section attached near the back right, the irregular tan stone pool deck, beige and blue sun loungers on the left, dark outdoor table and chairs on the right, rustic wooden fence and gray stone waterfall structure at the back right, the small red structure beside it, green shade-cloth perimeter, surrounding palms and trees, and the cloudy daytime sky. Keep the camera angle, relative placement, pool outline and architectural scale faithful to the original. Keep the courtyard empty of people.\nComposition: wide landscape 3:2 image, complete existing scene with the pool filling the lower foreground and lush trees along the upper edge. Natural architectural photography perspective, no dramatic changes to the viewpoint or layout.\nQuality: extremely clear blue mosaic detail visible under clean reflective water, natural tree foliage, detailed stone paving and realistic chair textures; balanced daylight exposure, gently warm stone tones and natural green foliage. Eliminate blocky pixels and JPEG compression. Premium professional photograph but still the same modest real property. Request highest available resolution, ideally 3072 by 2048 pixels.\nConstraints: no new structures, no extra furniture, no extra amenities, no altered pool shape, no people, no dramatic luxury makeover, no saturated artificial colors, no CGI or illustration aesthetic, no added text, no invented legible signage, no logos or watermark."
+}

@@ -1,0 +1,30 @@
+{
+  "tool": "built-in image_gen",
+  "mode": "edit",
+  "assets": [
+    {
+      "name": "garden",
+      "source": "public/assets/banners/2024-08-24-1-1.jpg",
+      "output": "public/assets/enhanced/garden-regenerated-v1.png",
+      "webAsset": "public/assets/enhanced/garden-regenerated-v1.webp",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "webp_bytes": 2584768,
+      "aliases": []
+    },
+    {
+      "name": "cottages",
+      "source": "public/assets/cottage/1-850x460.png",
+      "output": "public/assets/enhanced/cottages-regenerated-v1.png",
+      "webAsset": "public/assets/enhanced/cottages-regenerated-v1.webp",
+      "dimensions": [
+        1704,
+        923
+      ],
+      "webp_bytes": 2140082,
+      "aliases": []
+    }
+  ]
+}

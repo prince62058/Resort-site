@@ -1,0 +1,57 @@
+import {test, expect} from '@playwright/test';
+
+test('hero keeps playing on hover, with manual arrows and pause control', async ({page}) => {
+  await page.clock.install();
+  await page.goto('http://localhost:5173');
+  const hero = page.locator('.resort-carousel');
+  const next = page.getByRole('button', {name: 'Next resort photo'});
+  await expect(hero).toHaveAttribute('data-playing', 'true');
+  await expect(next).toHaveCSS('opacity', '0');
+  await page.clock.fastForward(6100);
+  await expect(hero).toHaveAttribute('data-slide', '1');
+  await hero.hover();
+  await expect(hero).toHaveAttribute('data-playing', 'true');
+  await expect(next).toHaveCSS('opacity', '1');
+  await page.clock.fastForward(6100);
+  await expect(hero).toHaveAttribute('data-slide', '2');
+  await next.click();
+  await expect(hero).toHaveAttribute('data-slide', '0');
+  await page.getByRole('button', {name: 'Previous resort photo'}).click();
+  await expect(hero).toHaveAttribute('data-slide', '2');
+  await page.getByRole('button', {name: 'Show resort photo 2'}).click();
+  await expect(hero).toHaveAttribute('data-slide', '1');
+  await page.getByRole('button', {name: 'Pause slideshow'}).click();
+  await page.locator('header .brand').focus();
+  await page.mouse.move(0, 0);
+  await page.clock.fastForward(12000);
+  await expect(hero).toHaveAttribute('data-slide', '1');
+  await page.getByRole('button', {name: 'Play slideshow'}).click();
+  await page.locator('header .brand').focus();
+  await page.mouse.move(0, 0);
+  await expect(hero).toHaveAttribute('data-playing', 'true');
+  await page.clock.fastForward(6100);
+  await expect(hero).toHaveAttribute('data-slide', '2');
+});
+
+test('reduced motion, keyboard navigation and mobile swipe', async ({page}) => {
+  await page.emulateMedia({reducedMotion: 'reduce'});
+  await page.setViewportSize({width: 390, height: 844});
+  await page.goto('http://localhost:5173');
+  const hero = page.locator('.resort-carousel');
+  await expect(hero).toHaveAttribute('data-playing', 'false');
+  await expect(page.getByRole('button', {name: 'Play slideshow'})).toBeVisible();
+  await hero.focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(hero).toHaveAttribute('data-slide', '1');
+  await page.keyboard.press('ArrowLeft');
+  await expect(hero).toHaveAttribute('data-slide', '0');
+  await hero.dispatchEvent('pointerdown', {pointerType: 'touch', clientX: 310, clientY: 280});
+  await hero.dispatchEvent('pointerup', {pointerType: 'touch', clientX: 100, clientY: 282});
+  await expect(hero).toHaveAttribute('data-slide', '1');
+  await hero.dispatchEvent('pointerdown', {pointerType: 'touch', clientX: 100, clientY: 280});
+  await hero.dispatchEvent('pointerup', {pointerType: 'touch', clientX: 110, clientY: 440});
+  await expect(hero).toHaveAttribute('data-slide', '1');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
+  await page.getByRole('button', {name: 'Find your escape', exact: true}).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+});
