@@ -53,7 +53,6 @@ textarea { resize: vertical; }
   .nest-motion-dock .motion-toggle { min-height: 44px; }
   .thumbnails { overscroll-behavior-x: contain; scroll-snap-type: x proximity; }
   .thumbnails button { scroll-snap-align: start; }
-  .site-header.menu-is-open .site-nav.open { padding-bottom: max(35px, env(safe-area-inset-bottom)); }
 }
 
 @media (max-width: 900px) {
@@ -89,8 +88,6 @@ textarea { resize: vertical; }
   .nav-book { font-size: 11px; gap: 7px; padding: 5px 5px 5px 12px; }
   .nav-book-icon { width: 25px; height: 30px; }
   .site-header .mobile-nav-intro { font-size: 9px; letter-spacing: 1px; }
-  .site-header .mobile-nav-footer > a { min-height: 44px; }
-  .site-header .mobile-nav-footer > span { font-size: 10px; }
   .site-header .mobile-nav-footer p { font-size: 12px; }
 
   .search-stay, .redesign .search-stay {
@@ -182,10 +179,6 @@ textarea { resize: vertical; }
   .nav-inner, .site-header.is-scrolled .nav-inner { height: 64px; }
   .site-header .nav-brand .brand3d .brand3d-mark { width: 44px; height: 44px; }
   .header-spacer { height: 65px; }
-  .site-header.menu-is-open .site-nav.open,
-  .site-header.is-scrolled.menu-is-open .site-nav.open { height: calc(100dvh - 65px); padding-top: 16px; }
-  .site-header .site-nav .nav-item { font-size: 24px; padding-top: 11px; padding-bottom: 11px; }
-  .mobile-nav-intro { margin-bottom: 8px; }
   .page-hero { height: 390px; }
   .page-hero > .page-hero-copy { padding-top: 64px; }
   .booking-modal, .nest-info-dialog { max-height: calc(100dvh - 20px); }

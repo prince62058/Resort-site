@@ -68,14 +68,31 @@ test('mobile menu scrolls to every link and closes correctly across orientation 
     expect(bounds.height).toBeGreaterThanOrEqual(44);
   }
   await page.getByRole('button', {name: 'Open menu'}).click();
-  await page.setViewportSize({width: 568, height: 320});
   const menu = page.getByRole('navigation', {name: 'Main navigation'});
+  for (const viewport of [{width: 320, height: 568}, {width: 375, height: 667}, {width: 390, height: 844}, {width: 430, height: 932}]) {
+    await page.setViewportSize(viewport);
+    await expect(page.locator('.nav-actions .nav-book')).toBeHidden();
+    const bounds = await menu.boundingBox();
+    expect(bounds.y + bounds.height).toBeLessThanOrEqual(viewport.height + 1);
+    expect(await menu.evaluate(element => element.scrollWidth <= element.clientWidth)).toBeTruthy();
+    for (const target of [menu.getByRole('link', {name: 'Contact', exact: true}), menu.getByRole('button', {name: /Book your escape/}), menu.locator('.mobile-nav-contact a')]) {
+      const rect = await target.boundingBox();
+      expect(rect.height).toBeGreaterThanOrEqual(44);
+      expect(rect.y + rect.height).toBeLessThanOrEqual(viewport.height);
+    }
+  }
+  await page.setViewportSize({width: 568, height: 320});
   expect((await menu.boundingBox()).height).toBeGreaterThan(240);
   await menu.getByRole('link', {name: 'Contact', exact: true}).click();
   await expect(page).toHaveURL(/contact-us$/);
   await expect(menu).toBeHidden();
   await expect(page.locator('main')).not.toHaveAttribute('inert');
   await page.setViewportSize({width: 390, height: 844});
+  await page.getByRole('button', {name: 'Open menu'}).click();
+  await menu.getByRole('button', {name: /Book your escape/}).click();
+  await expect(menu).toBeHidden();
+  await expect(page.locator('.booking-modal')).toBeVisible();
+  await page.getByRole('button', {name: 'Close reservation'}).click();
   await page.getByRole('button', {name: 'Open menu'}).click();
   await menu.getByRole('link', {name: 'Stay with us', exact: true}).click();
   await expect(page.locator('.room-card')).toHaveCount(12);

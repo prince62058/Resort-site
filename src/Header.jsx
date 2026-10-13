@@ -66,7 +66,13 @@ export default function Header({menu, setMenu, book}) {
           {links.map(([to, label], index) => <NavLink key={to} to={to} end={to === '/'} className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`} onClick={() => setMenu(false)} style={{'--nav-index': index}}>
             <span className="nav-number" aria-hidden="true">0{index + 1}</span><span>{label}</span><ArrowUpRight className="mobile-nav-arrow" size={23}/>
           </NavLink>)}
-          <div className="mobile-nav-footer"><span>LET’S PLAN YOUR STAY</span><a href="tel:+917777878822">+91 77778 78822 <ArrowUpRight size={18}/></a><p>Mhow, Indore · Madhya Pradesh</p></div>
+          <div className="mobile-nav-footer">
+            <button className="mobile-nav-book" onClick={() => {setMenu(false); book({});}}>
+              <span>Book your escape<small>A little time for yourself.</small></span><ArrowUpRight size={22}/>
+            </button>
+            <div className="mobile-nav-contact"><span>LET’S PLAN YOUR STAY</span><a href="tel:+917777878822"><Phone size={15}/> +91 77778 78822</a></div>
+            <p><MapPin size={13}/> Mhow, Indore · Madhya Pradesh</p>
+          </div>
         </nav>
         <div className="nav-actions">
           <button className="nav-book" aria-label="Book your escape" onClick={() => {setMenu(false); book({});}}><span className="nav-book-full">Book your escape</span><span className="nav-book-short">Book a stay</span><span className="nav-book-icon"><ArrowUpRight size={18}/></span></button>
