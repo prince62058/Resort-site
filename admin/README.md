@@ -16,7 +16,7 @@ Never commit `.env`, prefix credentials with `VITE_`, or place the setup token i
 
 - **Pages & SEO**: built-in pages and additional pages; page titles, text, hero photographs, navigation labels, URL slugs, SEO titles/descriptions, planning keywords, share images and noindex.
 - **Stays**: add, edit or remove rooms/villas, starting rates, amenities, descriptions, cover/slideshow images and homepage features.
-- **Experiences / Galleries / Journal**: manage content, images, publishing status, order and SEO. Journal content supports plain-text paragraphs separated by a blank line.
+- **Experiences / Galleries / Journal**: manage content, images, publishing status, order and SEO. Journal entries include categories and a featured-story switch. Selecting a featured story clears that flag from other posts; the first published story is used if none is selected. The first image is used on cards, and all images appear in the article slideshow. Journal content supports paragraphs, `##` / `###` headings and `-` lists, with an automatic contents list and reading time. Categories become public filters; visitors can also search titles and excerpts.
 - **Banners & sections**: homepage, stays and story carousels, image sequences, comfort links and FAQs. Use **Website copy** for the text in the existing designed sections and guest notices. Some captions assembled from room types/counts remain derived from their data.
 - **Media library**: browse the existing folder groups and upload raster images to `uploads/<folder>/`. Uploads are limited to 12 MB / 40 megapixels, re-encoded to WebP with a maximum edge of 2560 px and stripped of metadata. Existing resort originals are preserved. Unused new uploads can be deleted; referenced images cannot.
 - **Guest enquiries**: contact, reservation and newsletter requests are saved in MongoDB. Track new/in-progress/closed status and private follow-up notes. This does not confirm bookings, send emails, deliver newsletters or collect payments. Guests can continue their reservation conversation on WhatsApp.
@@ -31,7 +31,7 @@ SEO metadata, Open Graph tags, JSON-LD and an initial content summary are includ
 
 ## Storage and security
 
-MongoDB collections: `cms_content`, `cms_users`, `cms_sessions`, `cms_limits`, `cms_revisions`, `cms_enquiries`, plus the existing media catalog/GridFS bucket. The current website is seeded once using `$setOnInsert`. The guest-information upgrade adds only missing default pages and notice copy, preserves draft and published edits independently, and records a migration marker and revision. Later restarts do not restore pages an owner intentionally removes. Keep MongoDB backups enabled according to your hosting needs.
+MongoDB collections: `cms_content`, `cms_users`, `cms_sessions`, `cms_limits`, `cms_revisions`, `cms_enquiries`, plus the existing media catalog/GridFS bucket. The current website is seeded once using `$setOnInsert`. The guest-information upgrade adds only missing default pages and notice copy. The journal upgrade enables Blog navigation, adds three starter stories and missing category/featured fields, and keeps existing story text, URLs, SEO and custom page headings. Both preserve draft and published edits independently and record migration markers and revisions. Later restarts do not restore pages or stories an owner intentionally removes. Keep MongoDB backups enabled according to your hosting needs.
 
 ## Guest information and policies
 

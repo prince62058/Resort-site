@@ -1,3 +1,4 @@
+import Journal from './Journal.jsx';
 import GuestInformation, { FormPrivacy, ContactHelp } from './GuestInformation.jsx';
 import {t} from './content.js';
 import React, { useState, useEffect, useRef } from 'react';
@@ -200,16 +201,6 @@ function Contact() {
           setBusy(false);
         }
       }}><h3>{t("main.085", "A little hello goes a long way.")}</h3><label>{t("main.086", "Your name")}<input name="name" required maxLength={120} placeholder="Full name" /></label><div className="form-row"><label>{t("main.087", "Email address")}<input type="email" name="email" required maxLength={254} placeholder="you@example.com" /></label><label>{t("main.088", "Phone number")}<input type="tel" name="phone" maxLength={50} placeholder="Your phone number" /></label></div><label>{t("main.089", "What do you have in mind?")}<textarea name="message" required maxLength={5000} rows="4" placeholder="Tell us about your visit…" /></label><input className="form-trap" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" /><button disabled={busy} className="button">{busy ? 'Sending…' : 'Send enquiry'} <ArrowUpRight size={17} /></button>{notice && <p className="form-notice" role="status">{notice}</p>}<small>{t("main.090", "Our resort team will reply using your contact details.")}</small><FormPrivacy /></form></section><ContactHelp /></>;
-}
-function Journal({
-  article = false
-}) {
-  const {
-    slug
-  } = useParams();
-  const post = site.posts.find(p => p.slug === slug);
-  if (article && !post) return <MissingPage />;
-  return <><PageHero title={t("main.091", "Stories from")} italic={t("main.092", "the nest.")} subtitle={t("main.093", "Inspiration for your next unhurried escape.")} />{article ? <article className="section article"><Eyebrow>{t("main.094", "THE JOURNAL · ")}{post.date}</Eyebrow><h1>{post.name}</h1><PhotoSlideshow images={post.images} alt={post.name} interval={7800} />{post.body.split('\n\n').map((p, i) => <p key={i}>{p}</p>)}<Button to="/rooms">{t("main.095", "Explore your next stay")}</Button></article> : <section className="section">{site.posts.map(post => <Link key={post.id} className="journal-card" to={'/blog/' + post.slug}><PhotoSlideshow images={post.images} alt={post.name} interval={7800} /><div><Eyebrow>{post.date}{t("main.096", " · THE JOURNAL")}</Eyebrow><h2>{post.name}</h2><p>{post.summary}</p><span className="text-link">{t("main.097", "Read the story ")}<ArrowUpRight size={17} /></span></div></Link>)}</section>}</>;
 }
 function CustomPage({
   page

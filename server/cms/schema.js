@@ -102,6 +102,8 @@ export const contentSchema = z.object({
   })).max(100),
   posts: z.array(z.object({
     ...base,
+    category: z.string().trim().max(80).default('From the nest'),
+    featured: z.boolean().default(false),
     summary: text,
     body: z.string().max(100000),
     images,

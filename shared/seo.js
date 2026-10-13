@@ -20,6 +20,7 @@ export function seoFor(content, pathname, origin) {
   if (route?.type === 'posts') Object.assign(schema, {
     headline: item.name,
     datePublished: item.date,
+    articleSection: item.category || 'From the nest',
     author: {
       '@type': 'Organization',
       name: settings.fullName
@@ -76,7 +77,7 @@ export function initialMarkup(content, route) {
     body = content.heroSlides[0].description;
     links = content.rooms.filter(r => r.featured).map(r => `<p><a href="${e(itemPath(content, 'rooms', r))}">${e(r.name)}</a></p>`).join('');
   }
-  const formatted = ['legal', 'support'].includes(template);
+  const formatted = ['legal', 'support'].includes(template) || route.type === 'posts';
   const markup = formatted ? documentBlocks(body, content.settings).map(b => b.type === 'ul' ? '<ul>' + b.items.map(t => '<li>' + e(t) + '</li>').join('') + '</ul>' : `<${b.type}${b.id ? ' id="' + b.id + '"' : ''}>${e(b.text)}</${b.type}>`).join('') : body.split('\n\n').map(p => '<p>' + e(p) + '</p>').join('');
   if (template === 'support') links += content.faqs.map(f => `<section><h2>${e(f.question)}</h2><p>${e(f.answer)}</p></section>`).join('');
   if (template === 'contact' || formatted) links += `<address>${e(content.settings.address)}<br><a href="tel:+${e(content.settings.phoneDigits)}">${e(content.settings.phoneInternational)}</a><br><a href="mailto:${e(content.settings.email)}">${e(content.settings.email)}</a></address>`;

@@ -191,10 +191,10 @@
     {
       "id": "blog",
       "slug": "blog",
-      "name": "The journal",
+      "name": "Blog",
       "template": "blog",
       "status": "published",
-      "nav": false,
+      "nav": true,
       "order": 6,
       "body": "",
       "images": [
@@ -209,10 +209,10 @@
         "image": "enhanced/story/story-arrival-v1.webp",
         "noindex": false
       },
-      "heading": "",
-      "accent": "",
-      "subtitle": "",
-      "footerLabel": "The journal"
+      "heading": "Stories for a",
+      "accent": "slower kind of life.",
+      "subtitle": "Little discoveries, thoughtful stays and moments worth making time for. A few pages from life at The Nature Nest.",
+      "footerLabel": "Blog & stories"
     },
     {
       "id": "privacy-policy",
@@ -1266,6 +1266,86 @@
         "keywords": [],
         "image": "enhanced/story/story-arrival-v1.webp",
         "noindex": false
+      },
+      "category": "Slow travel",
+      "featured": true
+    },
+    {
+      "id": "a-slow-weekend",
+      "slug": "slow-weekend-getaway-mhow-near-indore",
+      "name": "A weekend with a little less on the agenda.",
+      "category": "Slow travel",
+      "summary": "Leave a little room in your plans. The best part of a getaway might be the time you haven’t filled.",
+      "images": [
+        "enhanced/story/story-unwind-v1.webp",
+        "enhanced/pool-regenerated-v1.webp"
+      ],
+      "body": "There is a particular kind of pleasure in arriving somewhere with no long list of things to do. A bag put down. A phone put away. An afternoon that belongs to you.\n\nA weekend in Mhow can begin with that feeling. Instead of trying to fit a whole holiday into a short stay, start with a smaller ambition: a change of surroundings and time to enjoy it.\n\n## Arrive with room to breathe\nGive yourself time to settle in before planning the next thing. Take a look around your accommodation, find a comfortable spot and let the journey end properly. Ask the team about the arrangements for your visit, then give the rest of the afternoon a little space.\n\nThere is no need to turn arrival into an itinerary. A conversation, a view of the garden and a quiet pause can be enough to mark the start of your break.\n\n## Make one plan, then leave a little space\nChoose one thing everyone looks forward to. It might be time by the pool, a shared meal or an unhurried walk around the resort. Confirm current access and timings with the team, especially if you are visiting with children or arranging a group stay.\n\nOnce that part is settled, resist filling every gap. The moments between plans are often where a weekend begins to feel like your own.\n\n## Let the morning be different\nTry a slower start than the one you have at home. Open the curtains, step out when you are ready and spend a few minutes without a screen. If breakfast is part of your plans, check your booking inclusions and enjoy it without watching the clock.\n\nA good morning does not need to be elaborate. It just needs a little attention.\n\n## Take the feeling home\nBefore you leave, think of one small part of the weekend you could keep: a meal without phones, a few minutes outdoors or an evening without another appointment.\n\nThe Nature Nest is a place to begin that pause. Browse the cottages and private villas, share your preferred dates with our team and let us help you plan the details.",
+      "featured": false,
+      "date": "2026-10-14",
+      "status": "published",
+      "order": 1,
+      "seo": {
+        "title": "A weekend with a little less on the agenda | Nature Nest",
+        "description": "Leave a little room in your plans. The best part of a getaway might be the time you haven’t filled.",
+        "keywords": [
+          "slow travel",
+          "Nature Nest Mhow"
+        ],
+        "image": "enhanced/story/story-unwind-v1.webp",
+        "noindex": false
+      }
+    },
+    {
+      "id": "cottage-or-villa",
+      "slug": "cottage-or-private-villa-choose-your-stay-mhow",
+      "name": "A cottage or a villa? Find your kind of stay.",
+      "category": "Stay stories",
+      "summary": "A quiet corner for two or more room for your favourite people—start with the way you want to spend your time.",
+      "images": [
+        "enhanced/cottages-regenerated-v1.webp",
+        "enhanced/story/story-arrival-v1.webp"
+      ],
+      "body": "Choosing where to stay becomes easier when you picture an ordinary moment from your trip. Your first cup of the day. A conversation after dinner. The place everyone gathers before heading out.\n\nThe right accommodation is the one that makes those moments feel comfortable. At The Nature Nest, our cottages and private villas give you different options to explore. Here are a few questions to help you choose.\n\n## Start with your people\nConsider who is travelling and how they like to spend their time. A couple may want a cosy place to retreat to. A family or group may care more about the room arrangement and space to spend time together.\n\nAsk the team to confirm the permitted occupancy, bed arrangements and any extra-guest requirements for the specific accommodation. The name of a room alone does not tell you everything about how it will suit your group.\n\n## Think about the in-between moments\nA stay is more than the hours you spend sleeping. If you enjoy a quiet morning or time outdoors, look closely at the listed photographs and descriptions, then ask about the exact layout and outdoor space available with your choice.\n\nIf a particular view, accessibility feature or private facility matters to you, have the team confirm it before booking. Features can differ between individual cottages and villas.\n\n## Look beyond the starting rate\nA starting price is a useful place to begin a conversation. For your dates, confirm the total price, taxes, meals, additional guests and any other inclusions. It is also a good moment to ask about payment and cancellation conditions.\n\nKeeping these details clear makes it easier to relax when you arrive.\n\n## Choose the feeling you want\nYou do not need to find the most elaborate option. Choose somewhere that fits the pace of your visit: a little privacy, time together, or a comfortable base for a weekend surrounded by green.\n\nExplore our stay collection and send an enquiry for the accommodation that catches your eye. Tell us who is coming and what matters to you, and our team can help you find a suitable option.",
+      "featured": false,
+      "date": "2026-10-14",
+      "status": "published",
+      "order": 2,
+      "seo": {
+        "title": "A cottage or a villa? Find your kind of stay | Nature Nest",
+        "description": "A quiet corner for two or more room for your favourite people—start with the way you want to spend your time.",
+        "keywords": [
+          "stay stories",
+          "Nature Nest Mhow"
+        ],
+        "image": "enhanced/cottages-regenerated-v1.webp",
+        "noindex": false
+      }
+    },
+    {
+      "id": "a-table-and-time",
+      "slug": "shared-meals-quiet-evenings-nature-nest",
+      "name": "A good evening starts with a little time together.",
+      "category": "Food & moments",
+      "summary": "A shared table, an easy conversation and no reason to rush. Make space for the simplest part of your getaway.",
+      "images": [
+        "enhanced/story/story-belong-v1.webp",
+        "banner1/1l2a1574.jpg"
+      ],
+      "body": "Some of the best memories of a trip happen after the day's plans are finished. Everyone settles around a table, the conversation wanders and nobody is hurrying to be somewhere else.\n\nAn evening at The Nature Nest can be a chance to make time for exactly that. You bring your favourite people; begin by talking to the team about the arrangements for your visit.\n\n## Start with the conversation\nFor a family meal, a couple's getaway or a gathering with friends, let the team know what you have in mind. Share the date, group size and any food preferences when you enquire.\n\nAsk about current dining options, service times and booking requirements. If an allergy or dietary need is important to your visit, discuss it directly with the team before confirming your plans.\n\n## Keep the occasion personal\nAn enjoyable evening does not always need decorations or a packed programme. It might be a long-overdue catch-up, a small celebration or simply the pleasure of eating together without interruptions.\n\nFor something more specific, such as a birthday or a group gathering, ask what the resort can arrange and confirm any additional costs. A little clarity beforehand leaves more room to enjoy the occasion itself.\n\n## Leave a little space after the meal\nIf the weather and the resort's current arrangements allow, take your time before heading back to your room. A quiet conversation and a moment outdoors can be a lovely way to let an evening finish.\n\nBe considerate of other guests and follow the team's guidance for shared spaces. A relaxed atmosphere is something everyone helps create.\n\n## Make time for your people\nA meal is often just the reason to bring everyone together. The part you remember is the company, the conversation and how it felt to pause for a while.\n\nIf you are planning a visit, send our team a note with your dates and the occasion. We can discuss the options and help you understand what is available for your stay.",
+      "featured": false,
+      "date": "2026-10-14",
+      "status": "published",
+      "order": 3,
+      "seo": {
+        "title": "A good evening starts with a little time together | Nature Nest",
+        "description": "A shared table, an easy conversation and no reason to rush. Make space for the simplest part of your getaway.",
+        "keywords": [
+          "food & moments",
+          "Nature Nest Mhow"
+        ],
+        "image": "enhanced/story/story-belong-v1.webp",
+        "noindex": false
       }
     }
   ],
@@ -1759,6 +1839,49 @@
     "guest.faq": "Frequently asked questions",
     "guest.contactLink": "Contact our team",
     "guest.related": "A LITTLE MORE CLARITY",
-    "guest.unsubscribe": "Unsubscribe by email"
+    "guest.unsubscribe": "Unsubscribe by email",
+    "journal.defaultCategory": "From the nest",
+    "journal.readTime": "min read",
+    "journal.readStory": "Read the story",
+    "journal.invitationImage": "A quiet escape at The Nature Nest",
+    "journal.invitationEyebrow": "MAKE A LITTLE TIME FOR YOU",
+    "journal.invitationTitle": "Your next story",
+    "journal.invitationAccent": "starts here.",
+    "journal.exploreStays": "Find your kind of stay",
+    "journal.eyebrow": "THE NATURE NEST JOURNAL",
+    "journal.edition": "NOTES FROM MHOW, INDORE",
+    "journal.heading": "Stories for a",
+    "journal.accent": "slower kind of life.",
+    "journal.subtitle": "Little discoveries, thoughtful stays and moments worth making time for. A few pages from life at The Nature Nest.",
+    "journal.browse": "Take a little look around",
+    "journal.featured": "THE FEATURED STORY",
+    "journal.featuredNote": "A little closer to the things that matter.",
+    "journal.featuredSignature": "LESS RUSH. MORE REAL LIFE.",
+    "journal.latestEyebrow": "WORTH A LITTLE OF YOUR TIME",
+    "journal.latestTitle": "More from ",
+    "journal.latestAccent": "the nest.",
+    "journal.searchPlaceholder": "Find a little inspiration",
+    "journal.allStories": "All stories",
+    "journal.storySingular": "story",
+    "journal.storyPlural": "stories",
+    "journal.noResults": "A different path, perhaps?",
+    "journal.moreSoon": "More stories are on their way.",
+    "journal.noResultsHelp": "Try another word or explore all of our stories.",
+    "journal.moreSoonHelp": "There’s always something to look forward to at the nest.",
+    "journal.reset": "Reset filters",
+    "journal.copied": "Link copied",
+    "journal.copyFallback": "You can copy this page’s address from your browser.",
+    "journal.back": "Back to the journal",
+    "journal.copyLink": "Copy link",
+    "journal.readingNote": "TAKE YOUR TIME",
+    "journal.stayNoteTitle": "Read it. Feel it. Live it.",
+    "journal.stayNoteCopy": "Make a little space for a getaway of your own.",
+    "journal.stayNoteLink": "Explore our stays",
+    "journal.endNote": "A LITTLE CLOSER TO NATURE. A LITTLE CLOSER TO YOU.",
+    "journal.allBack": "Explore all stories",
+    "journal.relatedEyebrow": "STAY A LITTLE LONGER",
+    "journal.relatedTitle": "One story leads to ",
+    "journal.relatedAccent": "another.",
+    "journal.missing": "This story is taking a little break."
   }
 }
