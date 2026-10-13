@@ -25,8 +25,8 @@ npm run media:sync
 npm run media:verify
 ```
 
-- All 524 image files are uploaded without resizing or changing their original bytes.
-- All 14 existing folder groups are preserved, including the root-level logo files, `3d`, `banner1`, `banners`, `backgrounds`, and the nested enhanced-image folders.
+- All 532 image files are uploaded without resizing or changing their original bytes.
+- All 15 folder groups are preserved, including the root-level logo files, `3d`, `branding`, `banner1`, `banners`, `backgrounds`, and the nested enhanced-image folders.
 - The database defaults to `nature_nest`.
 - `media_assets` is the searchable catalog: relative path, folder, filename, MIME type, byte size, SHA-256 checksum and active GridFS file ID.
 - `resort_media.files` and `resort_media.chunks` hold the actual image data. GridFS folders are represented by the filename and `metadata.folder`, not filesystem directories.
@@ -107,5 +107,7 @@ npm run media:verify
 Server tests cover image streaming, cache validation, local fallback, credential-safe errors, path validation and production route handling. Browser tests use installed Chrome; the mobile suite also uses WebKit (`npx playwright install webkit`). Tests cover navigation, photos, forms, gallery interactions, responsive layouts and motion controls without sending enquiries.
 
 ## Generated assets
+
+The favicon is a generated gold N monogram with a leaf and nest on a forest green background. The original artwork, six PNG sizes and multi-size ICO are in `public/assets/branding/`; its built-in image generation prompt is saved in `generation-prompt.json`. Browser tabs use 16/32px icons, Apple devices use the 180px touch icon, and the web manifest uses 192/512px icons. A conventional `/favicon.ico` fallback is included.
 
 The 3D emblem and icons were generated with the built-in image generation tool. Transparent PNG originals and WebP delivery files are retained in `public/assets/3d/`. The original resort logo is also retained. Generation prompts remain in the corresponding JSON files. The original HTML export is a local backup excluded from Git.

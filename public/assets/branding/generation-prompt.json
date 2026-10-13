@@ -1,0 +1,16 @@
+{
+  "asset": "favicon-source-v1.png",
+  "tool": "Built-in image_gen",
+  "useCase": "logo-brand",
+  "prompt": "Use case: logo-brand. Asset type: production browser favicon / app icon for The Nature Nest boutique hotel and resort. Create ONE finished, square 1024x1024 icon, filling the canvas edge to edge with a solid very dark forest green (#183b2c) background. Center one bold, elegant, immediately recognizable capital N in warm champagne gold (#ddc78c), with a single small botanical leaf integrated into the upper right terminal and a subtle upward-curving nest-like base connected into the letter. Aim for an exceptionally clean luxury hospitality monogram. The capital N must dominate, occupying approximately 76% of the image width and height, with thick, smooth, high contrast strokes and generous negative space between strokes, so it remains clear when reduced to 16x16 pixels. Near-flat vector-style precision with only very restrained satin gold shading; straight-on orthographic view. Uniform forest green background to every edge, no outer border, no frame, no circle, no rounded corner white margins, no mockup, no surrounding objects, no tiny decorative lines, no hotel wordmark, no extra letters, no tagline, no watermark. This is the actual standalone icon artwork, not a presentation of an icon.",
+  "exports": [
+    "favicon-16-v1.png",
+    "favicon-32-v1.png",
+    "favicon-48-v1.png",
+    "apple-touch-icon-v1.png",
+    "icon-192-v1.png",
+    "icon-512-v1.png",
+    "favicon-v1.ico"
+  ],
+  "notes": "The generated artwork is unchanged; smaller PNGs are size exports and the ICO packages 16/32/48px PNG frames."
+}
