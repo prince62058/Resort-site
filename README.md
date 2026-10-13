@@ -1,118 +1,25 @@
-# The Nature Nest — React website
+# Nature Nest — public website
 
-A responsive resort website built with React, Vite, React Router and Lucide icons, with an Express backend and a MongoDB GridFS image library. Original photographs, enhanced versions, logos and 3D icons remain in `public/assets/` as a local fallback.
+Independent React/Vite website for The Nature Nest. This repository contains the public UI, images and a small Express server for SEO and forwarding public API/media requests to the separate backend. It contains no MongoDB connection or admin studio source.
 
-## Run locally
+- Backend: https://github.com/prince62058/Resort-backend
+- Admin: https://github.com/prince62058/resort-admin
+- Complete three-app setup: [DEPLOYMENT.md](DEPLOYMENT.md)
 
-Requires Node.js 22 or newer.
+## Run
 
-```sh
-npm install
-cp .env.example .env
-# Set your MongoDB credentials in .env before syncing images.
-npm run media:sync
-npm run dev
-```
+Use Node.js 22, `npm ci`, and copy `.env.example` to `.env` with local values. Run the backend separately, then `npm run dev` (port 5173). For production, run `npm run build` then `npm start`.
 
-`npm run dev` starts Vite on port 5173 and the media backend on port 5174. Vite proxies `/api` and `/assets` to the backend. Existing image URLs, galleries, slideshows and CSS backgrounds automatically use MongoDB through these routes; no credentials are sent to React.
+## Dokploy
 
-The local `.env` contains server credentials and is excluded from Git. `.env.example` contains placeholders. Never use a `VITE_` prefix for a MongoDB URI, and never upload the real `.env` to a public repository. If MongoDB is not configured, the backend serves local images; if it is unavailable, existing local images remain available and `/api/health` reports the failure.
+Branch `main`, build path `/`, Nixpacks, container port `3000`. Configuration is in `nixpacks.toml`; Dockerfile deployment is also supported. Set `NODE_ENV=production`, `PORT=3000`, `BACKEND_URL` to the reachable backend origin, and `ADMIN_URL` to the public admin URL.
 
-## MongoDB image library
+Deploy as a Node application, since its server provides dynamic SEO/slug redirects and the API gateway. MongoDB secrets belong only to the backend. Site settings → Live website URL in the admin controls canonical and sitemap URLs.
 
-```sh
-npm run media:sync
-npm run media:verify
-```
+## Preserved features
 
-- All 532 image files are uploaded without resizing or changing their original bytes.
-- All 15 folder groups are preserved, including the root-level logo files, `3d`, `branding`, `banner1`, `banners`, `backgrounds`, and the nested enhanced-image folders.
-- The database defaults to `nature_nest`.
-- `media_assets` is the searchable catalog: relative path, folder, filename, MIME type, byte size, SHA-256 checksum and active GridFS file ID.
-- `resort_media.files` and `resort_media.chunks` hold the actual image data. GridFS folders are represented by the filename and `metadata.folder`, not filesystem directories.
-- The sync skips unchanged images and can safely resume after interruption. Changed images get a new version; existing files are not deleted.
-- Verification compares every local file's checksum and size against the catalog and GridFS length, then downloads one image from each folder to check its stored bytes.
-- JSON generation notes are retained locally/in Git, not uploaded as images.
+Responsive pages and navigation, animated photo slideshows, original/generated images, stays and room details, blog/articles, guest policy pages, enquiries, gallery controls, reduced-motion preferences and server-rendered SEO all remain available. Public API requests and newly uploaded images are fetched through the backend. Bundled original images remain available as fallback copies.
 
-The upload command is a server-side CLI; there is no public upload endpoint. Public endpoints expose only the site's public image library:
+## Tests
 
-| Endpoint | Purpose |
-| --- | --- |
-| `GET /api/health` | Reports `mongodb`, `local` or `unavailable` media status. |
-| `GET /api/media/folders` | Folder names, image counts and total bytes. |
-| `GET /api/media?folder=3d&page=1&limit=100` | Exact-folder image catalog; omit `folder` for all images, or use `folder=` for root files. Maximum limit: 200. |
-| `GET /assets/<folder>/<filename>` | Existing website image URL, served from MongoDB with ETag caching. |
-| `GET /api/media/file/<folder>/<filename>` | Alternate URL for the same database-managed image. |
-
-Responses include `X-Media-Source: mongodb` for database-managed images and `X-Media-Source: local` for an unverified local fallback. To avoid repeated cloud downloads, the backend checks bundled copies against the catalog's SHA-256 checksum and keeps up to 32 MiB in an LRU memory cache. `X-Media-Cache: verified-local` identifies these exact matching copies; `X-Media-Cache: gridfs` identifies direct database streams. The catalog cache expires after 60 seconds. A different database checksum bypasses an outdated bundled image. Database errors and credentials are not returned in API responses.
-
-## Production on Hostinger
-
-Use a **Node.js web app / Express deployment** for the connected backend, rather than publishing only the Vite `dist` folder. Import the GitHub repository `prince62058/Resort-site`, branch `main`, at the repository root.
-
-- Node.js: 22 or newer.
-- Install: `npm ci`.
-- Build command: `npm run build`.
-- Start command: `npm start` (entry point: `server/index.js`).
-- Frontend build directory: `dist`. Keep the server source and production dependencies in the Node.js deployment.
-
-Add these in Hostinger's server environment settings:
-
-| Variable | Value |
-| --- | --- |
-| `MONGODB_URI` | Your private Atlas connection string; copy the value from the local `.env`. |
-| `MONGODB_DB` | `nature_nest` |
-| `MEDIA_BUCKET` | `resort_media` |
-| `NODE_ENV` | `production` |
-| `PORT` | Use the port assigned by the hosting platform. |
-
-The server reads Hostinger's `PORT` and listens on `0.0.0.0`. Allow the deployed server's outbound IP in Atlas Network Access. Redeploy after changing environment settings, then check `/api/health` for `{"ready":true,"media":"mongodb"}` and an image's `X-Media-Source` response header.
-
-Images already uploaded to Atlas do not need to be re-uploaded on every deployment. Run `npm run media:sync` locally when image files change, followed by `npm run media:verify`.
-
-Hostinger reference: [Deploy a Node.js website](https://www.hostinger.com/support/how-to-deploy-a-nodejs-website-in-hostinger/).
-MongoDB reference: [Store files with GridFS](https://www.mongodb.com/docs/drivers/node/current/crud/gridfs/).
-
-For a local production preview including MongoDB:
-
-```sh
-npm run build
-npm start
-```
-
-The Express server serves the built React app and supports direct links such as `/rooms` and `/about`. `npm run preview`, Netlify and Vercel's existing static configurations preview/deploy only the frontend and bundled local assets; they do not deploy this MongoDB backend.
-
-## Included
-
-- Responsive home page, resort story, experiences, contact and journal.
-- All 12 original accommodation listings, prices and galleries.
-- Automatic slideshows, large photo viewer, global pause/play, hover pausing and reduced-motion support.
-- Transparent navigation, compact mobile menu and compact shared footer.
-- Date-validated reservation enquiries prepared for WhatsApp, and contact enquiries prepared for email.
-- Original blog content, resort photographs and contact information.
-
-## Admin studio and dynamic content
-
-Open `/admin/` for the separate React admin application in [admin/](admin/README.md). Manage pages/slugs/SEO, stays, experiences, galleries, journal posts, banners, website copy, logos/icons, contact details, media uploads and guest enquiries. Drafts and published content live in MongoDB; slug changes create redirects, and the server generates page metadata, `/sitemap.xml` and `/robots.txt`.
-
-Run `npm run admin:setup-token` to create the private first-account token, add it as `ADMIN_SETUP_TOKEN` in Hostinger, and create your own owner login at `/admin/`. Set `NODE_ENV=production` and use HTTPS in production. After signing in, set the final domain under **Site settings → Live website URL**. See [admin/README.md](admin/README.md) for the complete setup and recovery guide.
-
-Contact, reservation and newsletter forms now save requests to the admin inbox. Reservation requests can also continue on WhatsApp. This is an enquiry workflow, not confirmed inventory, a payment gateway, automatic email delivery or a newsletter sending service.
-
-## Verification
-
-```sh
-npm run test:server
-npm run test:admin
-npm test
-npm run test:mobile
-npm run media:verify
-```
-
-Server tests cover image streaming, cache validation, local fallback, credential-safe errors, path validation and production route handling. Browser tests use installed Chrome; the mobile suite also uses WebKit (`npx playwright install webkit`). Tests cover navigation, photos, forms, gallery interactions, responsive layouts and motion controls without sending enquiries.
-
-## Generated assets
-
-The favicon is a generated gold N monogram with a leaf and nest on a forest green background. The original artwork, six PNG sizes and multi-size ICO are in `public/assets/branding/`; its built-in image generation prompt is saved in `generation-prompt.json`. Browser tabs use 16/32px icons, Apple devices use the 180px touch icon, and the web manifest uses 192/512px icons. A conventional `/favicon.ico` fallback is included.
-
-The 3D emblem and icons were generated with the built-in image generation tool. Transparent PNG originals and WebP delivery files are retained in `public/assets/3d/`. The original resort logo is also retained. Generation prompts remain in the corresponding JSON files. The original HTML export is a local backup excluded from Git.
+`npm run test:server` verifies the gateway's origin protection, streaming and failure handling. `npm test` checks the public UI with Chrome; `npm run test:mobile` includes mobile Chrome/WebKit. Full cross-repository integration tests run from the backend repo with the apps checked out as siblings and built first.

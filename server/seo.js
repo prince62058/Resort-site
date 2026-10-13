@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { routesFor, resolveRoute } from '../../shared/content.js';
-import { seoFor, seoHead, safeJson, escapeHtml, initialMarkup } from '../../shared/seo.js';
+import { routesFor, resolveRoute } from '../shared/content.js';
+import { seoFor, seoHead, safeJson, escapeHtml, initialMarkup } from '../shared/seo.js';
 export function installSeo(app, cms, root) {
   app.get('/robots.txt', async (req, res) => {
     const {
