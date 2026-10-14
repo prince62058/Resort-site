@@ -1,12 +1,12 @@
 import { t } from './content.js';
 import { site } from './content.js';
-import { resolveRoute } from '../shared/content.js';
+import { resolveRoute, pagePath } from '../shared/content.js';
 import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Link, NavLink } from './SiteLink.jsx';
 import { ArrowUpRight, Leaf, MapPin, Phone, X } from 'lucide-react';
 import './header.css';
-import { Brand3D } from './Brand3D.jsx';
+import { SiteLogo } from './Brand3D.jsx';
 export default function Header({
   menu,
   setMenu,
@@ -20,7 +20,8 @@ export default function Header({
   const header = useRef(null);
   const toggle = useRef(null);
   const route = resolveRoute(site, pathname);
-  const hasHero = Boolean(route && !['rooms', 'posts'].includes(route.type) && !['legal', 'support', 'blog'].includes(route.item.template));
+  const getawayHref = pagePath(site, 'getaway');
+  const hasHero = Boolean(route && !['rooms', 'posts'].includes(route.type) && !['legal', 'support', 'blog', 'getaway'].includes(route.item.template));
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 45);
     onScroll();
@@ -78,7 +79,7 @@ export default function Header({
       </div>
       <div className="nav-inner">
         <Link to="/" className="brand nav-brand" aria-label="The Nature Nest home" onClick={() => setMenu(false)}>
-          <Brand3D />
+          <SiteLogo />
         </Link>
         <nav id="primary-navigation" aria-label="Main navigation" className={`site-nav ${menu ? 'open' : ''}`}>
           <div className="mobile-nav-intro"><Leaf size={19} />{t("Header.003", " A LITTLE CLOSER TO NATURE")}</div>
@@ -90,21 +91,15 @@ export default function Header({
             <span className="nav-number" aria-hidden="true">0{index + 1}</span><span>{label}</span><ArrowUpRight className="mobile-nav-arrow" size={23} />
           </NavLink>)}
           <div className="mobile-nav-footer">
-            <button className="mobile-nav-book" onClick={() => {
-              setMenu(false);
-              book({});
-            }}>
-              <span>{t("Header.004", "Book your escape")}<small>{t("Header.005", "A little time for yourself.")}</small></span><ArrowUpRight size={22} />
-            </button>
+            <Link className="mobile-nav-book" to={getawayHref} onClick={() => setMenu(false)}>
+              <span>{t("Header.009", "Plan your perfect getaway")}<small>{t("Header.005", "A little time for yourself.")}</small></span><ArrowUpRight size={22} />
+            </Link>
             <div className="mobile-nav-contact"><span>{t("Header.006", "LET’S PLAN YOUR STAY")}</span><a href={'tel:+' + site.settings.phoneDigits}><Phone size={15} /> {site.settings.phoneInternational}</a></div>
             <p><MapPin size={13} /> {site.settings.location}</p>
           </div>
         </nav>
         <div className="nav-actions">
-          <button className="nav-book" aria-label="Book your escape" onClick={() => {
-            setMenu(false);
-            book({});
-          }}><span className="nav-book-full">{t("Header.007", "Book your escape")}</span><span className="nav-book-short">{t("Header.008", "Book a stay")}</span><span className="nav-book-icon"><ArrowUpRight size={18} /></span></button>
+          <Link className="nav-book" to={getawayHref} aria-label={t("Header.009", "Plan your perfect getaway")} onClick={() => setMenu(false)}><span className="nav-book-full">{t("Header.009", "Plan your perfect getaway")}</span><span className="nav-book-short">{t("Header.010", "Plan a getaway")}</span><span className="nav-book-icon"><ArrowUpRight size={18} /></span></Link>
           <button ref={toggle} className="nav-toggle" aria-label={menu ? 'Close menu' : 'Open menu'} aria-expanded={menu} aria-controls="primary-navigation" onClick={() => setMenu(value => !value)}>
             {menu ? <X size={23} /> : <span className="menu-lines"><span /><span /></span>}
           </button>

@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { seoFor, safeJson } from '../shared/seo.js';
 import { site } from './content.js';
+import { faviconFor } from '../shared/brand.js';
 export default function Seo() {
   const {
     pathname
@@ -54,7 +55,7 @@ export default function Seo() {
     document.head.querySelectorAll('link[rel="icon"]').forEach(el => el.remove());
     set('link[rel="icon"]', 'link', {
       rel: 'icon',
-      href: '/assets/' + site.settings.favicon
+      href: '/assets/' + faviconFor(site.settings)
     });
   }, [pathname]);
   return null;

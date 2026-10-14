@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { GuestLink } from './GuestInformation.jsx';
 import { Link } from './SiteLink.jsx';
 import { ArrowUp, ArrowUpRight, Facebook, Instagram, Linkedin, Youtube, Mail, MapPin, Phone } from 'lucide-react';
-import { Brand3D, Sculpture } from './Brand3D.jsx';
+import { SiteLogo, Sculpture } from './Brand3D.jsx';
 import { useMotion } from './Motion.jsx';
 import './footer.css';
 function Newsletter() {
@@ -53,7 +53,7 @@ export default function Footer({
         </div>
         <div className="nest-footer-grid">
           <section className="nest-footer-contact" aria-label="Resort contact details">
-            <Link to="/" className="nest-footer-brand" aria-label="The Nature Nest home"><Brand3D /></Link>
+            <Link to="/" className="nest-footer-brand" aria-label="The Nature Nest home"><SiteLogo /></Link>
             <p className="nest-brand-note">{site.settings.tagline}</p>
             <address>
               <a href={contact.phoneLink} className="nest-contact-row"><span className="nest-contact-icon"><Phone size={16} /></span><span><small>{t("Footer.014", "GIVE US A CALL")}</small>{contact.phone}</span></a>

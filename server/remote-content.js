@@ -1,4 +1,5 @@
 import {backendOrigin} from './gateway.js';
+import {withGetawayPage} from '../shared/getaway.js';
 export function remoteContent(backendUrl) {
   const origin = backendOrigin(backendUrl);
   let previous;
@@ -8,6 +9,7 @@ export function remoteContent(backendUrl) {
       if (!response.ok) throw new Error('Content unavailable.');
       const state = await response.json();
       if (!state.content?.settings || !Array.isArray(state.content.pages)) throw new Error('Invalid content response.');
+      state.content = withGetawayPage(state.content);
       previous = state;
       return state;
     } catch (error) {

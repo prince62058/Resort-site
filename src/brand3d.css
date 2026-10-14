@@ -91,3 +91,16 @@
   .nav-toggle { width: 31px; height: 31px; }
 }
 @media (prefers-reduced-motion: reduce) { .brand3d, .brand3d.is-moving .brand3d-mark, .sculpture, .sculpture.is-moving img, .comfort3d, .comfort3d-arrow { animation: none; transition: none; } }
+
+/* Original logo. The PNG has wide transparent margins, so crop them with object-fit instead of layout width. */
+img.brand-logo { display: block; width: auto; height: 84px; aspect-ratio: 1.16 / 1; object-fit: cover; object-position: center; max-width: none; }
+.site-header .nav-brand { width: auto; }
+.site-header .nav-brand img.brand-logo { width: auto; aspect-ratio: 1.16 / 1; object-fit: cover; }
+.site-header .nav-brand:hover img.brand-logo { transform: scale(1.045); }
+.nest-footer-brand img.brand-logo { height: 118px; margin: -6px 0 0 -6px; filter: none; }
+@media (max-width: 640px) { .nest-footer-brand img.brand-logo { height: 104px; } }
+.site-header .nav-brand img.brand-logo { height: 98px; }
+.site-header.is-scrolled .nav-brand img.brand-logo { height: 76px; }
+@media (max-width: 1050px) { .site-header .nav-brand img.brand-logo { height: 86px; } .site-header.is-scrolled .nav-brand img.brand-logo { height: 76px; } }
+@media (max-width: 640px) { .site-header .nav-brand img.brand-logo { height: 76px; } .site-header.is-scrolled .nav-brand img.brand-logo { height: 66px; } }
+.site-header.menu-is-open .nav-brand img.brand-logo { height: 66px; }

@@ -77,7 +77,7 @@ test('mobile menu scrolls to every link and closes correctly across orientation 
     const bounds = await menu.boundingBox();
     expect(bounds.y + bounds.height).toBeLessThanOrEqual(viewport.height + 1);
     expect(await menu.evaluate(element => element.scrollWidth <= element.clientWidth)).toBeTruthy();
-    for (const target of [menu.getByRole('link', {name: 'Contact', exact: true}), menu.getByRole('button', {name: /Book your escape/}), menu.locator('.mobile-nav-contact a')]) {
+    for (const target of [menu.getByRole('link', {name: 'Contact', exact: true}), menu.getByRole('link', {name: /Plan your perfect getaway/}), menu.locator('.mobile-nav-contact a')]) {
       const rect = await target.boundingBox();
       expect(rect.height).toBeGreaterThanOrEqual(44);
       expect(rect.y + rect.height).toBeLessThanOrEqual(viewport.height);
@@ -91,10 +91,10 @@ test('mobile menu scrolls to every link and closes correctly across orientation 
   await expect(page.locator('main')).not.toHaveAttribute('inert');
   await page.setViewportSize({width: 390, height: 844});
   await page.getByRole('button', {name: 'Open menu'}).click();
-  await menu.getByRole('button', {name: /Book your escape/}).click();
+  await menu.getByRole('link', {name: /Plan your perfect getaway/}).click();
   await expect(menu).toBeHidden();
-  await expect(page.locator('.booking-modal')).toBeVisible();
-  await page.getByRole('button', {name: 'Close reservation'}).click();
+  await expect(page).toHaveURL(/plan-your-getaway$/);
+  await expect(page.getByRole('heading', {level: 1, name: /Plan Your Perfect Getaway/})).toBeVisible();
   await page.getByRole('button', {name: 'Open menu'}).click();
   await menu.getByRole('link', {name: 'Stay with us', exact: true}).click();
   await expect(page.locator('.room-card')).toHaveCount(12);

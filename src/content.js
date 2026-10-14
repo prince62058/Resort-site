@@ -1,6 +1,7 @@
 import seed from '../shared/seed.json';
 import { publicContent } from '../shared/content.js';
-export let site = publicContent(seed);
+import { withGetawayPage } from '../shared/getaway.js';
+export let site = withGetawayPage(publicContent(seed));
 export let redirects = {};
 export async function loadContent() {
   try {
@@ -11,7 +12,7 @@ export async function loadContent() {
       if (!r.ok) throw new Error('Content unavailable');
       return r.json();
     });
-    site = state.content;
+    site = withGetawayPage(state.content);
     redirects = state.redirects || {};
   } catch {/* The bundled content keeps the resort readable during an outage. */}
 }

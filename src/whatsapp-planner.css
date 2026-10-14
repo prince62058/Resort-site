@@ -1,0 +1,59 @@
+.wa-planner { position: fixed; right: max(20px, env(safe-area-inset-right)); bottom: max(20px, env(safe-area-inset-bottom)); z-index: 95; display: flex; flex-direction: column; align-items: flex-end; gap: 14px; font-family: 'DM Sans', sans-serif; }
+.wa-planner.is-hidden { visibility: hidden; }
+body:has(.menu-is-open) .wa-planner, body:has(dialog[open]) .wa-planner, body:has(.lightbox) .wa-planner { visibility: hidden; }
+.wa-planner button, .wa-planner a { font: inherit; }
+
+.wa-launcher { display: grid; place-items: center; width: 62px; height: 62px; padding: 0; border: 2px solid #5ec58a; border-radius: 50%; background: #0f5a3a; color: #fff; cursor: pointer; box-shadow: 0 10px 30px #0a2a1c55; transition: transform .2s, box-shadow .2s, background .2s; animation: wa-pulse 3.2s ease-out 2s 3; }
+.wa-launcher:hover { background: #136b45; transform: translateY(-2px) scale(1.04); box-shadow: 0 14px 34px #0a2a1c66; }
+
+.wa-launcher:focus-visible, .wa-close:focus-visible, .wa-options a:focus-visible, .wa-general:focus-visible { outline: 3px solid #d8b86a; outline-offset: 3px; }
+
+.wa-panel { width: min(420px, calc(100vw - 32px)); max-height: min(660px, calc(100dvh - 120px)); display: flex; flex-direction: column; overflow: hidden; border-radius: 18px; background: #f7f3e6; box-shadow: 0 24px 70px #0a1f1566; border: 1px solid #d9d3bb; animation: wa-rise .25s ease both; }
+.wa-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px 14px 20px; background: #164a31; color: #f3ecd2; }
+.wa-panel-brand { display: flex; align-items: center; gap: 12px; color: #d8b86a; }
+.wa-panel-brand > span { display: flex; flex-direction: column; font-family: 'Playfair Display', Georgia, serif; font-size: 22px; line-height: 1.1; color: #f3ecd2; }
+.wa-panel-brand small { font-family: 'DM Sans', sans-serif; font-size: 8px; letter-spacing: 2.2px; color: #d8b86a; }
+.wa-close { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: transparent; color: #f3ecd2; cursor: pointer; }
+.wa-close:hover { background: #ffffff1a; }
+.wa-panel-body { padding: 18px 16px 16px; overflow-y: auto; overscroll-behavior: contain; }
+.wa-panel-body h2 { margin: 0 4px 2px; font-size: 25px; line-height: 1.25; letter-spacing: 0; color: #1d3a2b; }
+.wa-panel-body p { margin: 0 4px 14px; font-size: 14px; line-height: 1.5; color: #5c6656; }
+
+.wa-options { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.wa-options a { position: relative; display: flex; align-items: center; gap: 12px; min-height: 72px; padding: 8px 12px 8px 8px; border: 1px solid #e3dec8; border-radius: 12px; background: #fffdf6; color: #1d3a2b; transition: border-color .2s, background .2s, transform .2s; }
+.wa-options a:hover { border-color: #5a9c73; background: #f2f8ee; transform: translateX(2px); }
+.wa-thumb { position: relative; width: 68px; height: 56px; flex: 0 0 68px; border-radius: 9px; overflow: hidden; background: #dfe5d2; }
+.wa-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.wa-number { position: absolute; top: 3px; left: 3px; display: grid; place-items: center; min-width: 20px; height: 18px; padding: 0 4px; border-radius: 9px; background: #1f4a33d9; color: #f4f0dc; font-size: 9px; font-weight: 600; letter-spacing: .4px; }
+.wa-icon { display: grid; place-items: center; width: 34px; height: 34px; flex: 0 0 34px; border-radius: 50%; background: #efe9cf; color: #1f5a3c; }
+.wa-copy { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.wa-copy strong { font-size: 14px; font-weight: 600; line-height: 1.3; }
+.wa-copy small { font-size: 12px; line-height: 1.4; color: #6d7666; }
+.wa-options a > svg:last-of-type { flex-shrink: 0; color: #5a7a60; }
+.wa-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.wa-general { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; margin-top: 12px; border-radius: 10px; font-size: 13px; font-weight: 500; color: #1f5a3c; border: 1px dashed #9db48f; }
+.wa-general:hover { background: #ecf3e3; }
+
+@keyframes wa-rise { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes wa-pulse { 0% { box-shadow: 0 10px 30px #0a2a1c55, 0 0 0 0 #5ec58a88; } 70%, 100% { box-shadow: 0 10px 30px #0a2a1c55, 0 0 0 18px #5ec58a00; } }
+
+@media (max-width: 640px) {
+  .wa-planner { right: max(12px, env(safe-area-inset-right)); bottom: max(12px, env(safe-area-inset-bottom)); }
+  .wa-launcher { width: 58px; height: 58px; }
+  .wa-panel { width: calc(100vw - 24px); max-height: calc(100dvh - 90px); }
+  .wa-panel-body h2 { font-size: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wa-launcher, .wa-panel { animation: none; }
+  .wa-launcher, .wa-options a { transition: none; }
+}
+
+/* Keep the page's floating motion toggle from sitting on top of the open panel. */
+body:has(.wa-panel) .motion-toggle { visibility: hidden; }
+
+@media (max-width: 420px) { .wa-icon { display: none; } }
+.wa-copy small { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Leave the bottom-right corner of the footer free so "Back to top" is never covered by the launcher. */
+footer .nest-footer-bottom { padding-right: 84px; }
+@media (max-width: 640px) { footer .nest-footer-bottom { padding-right: 76px; } }

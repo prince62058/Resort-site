@@ -23,6 +23,10 @@ function useVisibleMotion() {
     moving: enabled && visible
   };
 }
+// The resort's original logo (tree, house, bird and wordmark), used exactly as published.
+export function SiteLogo({ className = '' }) {
+  return <img className={'brand-logo ' + className} src={'/assets/' + (site.settings.brandLogo || 'nature-nest-logo-png-2.png')} alt="" width="850" height="460" decoding="async" />;
+}
 export function Brand3D() {
   const {
     ref,
