@@ -3,7 +3,7 @@ import { site, submitEnquiry } from './content.js';
 import { useState } from 'react';
 import { GuestLink } from './GuestInformation.jsx';
 import { Link } from './SiteLink.jsx';
-import { ArrowUp, ArrowUpRight, Facebook, Instagram, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
+import { ArrowUp, ArrowUpRight, Facebook, Instagram, Linkedin, Youtube, Mail, MapPin, Phone } from 'lucide-react';
 import { Brand3D, Sculpture } from './Brand3D.jsx';
 import { useMotion } from './Motion.jsx';
 import './footer.css';
@@ -40,7 +40,7 @@ export default function Footer({
     phoneLink: 'tel:+' + site.settings.phoneDigits
   };
   const explore = site.pages.filter(p => !p.footerGroup || p.footerGroup === 'main').map(p => [p.footerLabel || p.name, '/' + p.slug]);
-  const socials = [['Instagram', Instagram, site.settings.instagram], ['Facebook', Facebook, site.settings.facebook], ['LinkedIn', Linkedin, site.settings.linkedin]].filter(s => s[2]);
+  const socials = [['Instagram', Instagram, site.settings.instagram], ['Facebook', Facebook, site.settings.facebook], ['LinkedIn', Linkedin, site.settings.linkedin], ['YouTube', Youtube, site.settings.youtube]].filter(s => s[2]);
   const {
     enabled
   } = useMotion();

@@ -67,6 +67,7 @@
 .nest-footer-social > div { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
 .nest-footer-social a { display: grid; place-items: center; width: 37px; height: 37px; border: 1px solid #c6d2ad38; border-radius: 50%; color: #d3ddc2; transition: color .25s, background .25s, transform .25s; }
 .nest-footer-social a:hover { color: #203b2b; background: #dce3c6; transform: translateY(-4px); }
+.nest-footer-social a:focus-visible { outline: 2px solid #dce3c6; outline-offset: 4px; color: #203b2b; background: #dce3c6; }
 .nest-newsletter { position: relative; background: #e4e7d5; border: 1px solid #f3f4e26e; padding: 18px 20px; color: #233b2d; border-radius: 3px 26px 3px 3px; box-shadow: 0 15px 45px #020e091c; }
 .nest-newsletter > .sculpture { position: absolute; right: 10px; top: 8px; --sculpture-size: 43px; }
 .nest-newsletter .nest-kicker { font-size: 7px; color: #53684b; letter-spacing: 1.5px; padding-right: 40px; }
@@ -146,6 +147,7 @@
   .nest-footer-social { margin-top: 12px; }
   .nest-footer-social > span { font-size: 6px; letter-spacing: 1px; }
   .nest-footer-social > div { gap: 7px; }
+  .nest-footer-social > div:has(> a:nth-child(4)) { display: grid; grid-template-columns: repeat(2, max-content); gap: 8px; }
   .nest-footer-social a { width: 34px; height: 34px; }
   .nest-newsletter { display: block; grid-column: 1 / -1; padding: 18px 20px; margin-top: 0; }
   .nest-newsletter h3 { font-size: 27px; margin: 12px 0 8px; }
