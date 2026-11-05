@@ -77,7 +77,8 @@
 .journal-back{display:inline-flex;align-items:center;gap:12px;font-size:11px;color:#5d7550}
 .journal-article-heading>.journal-back{display:flex;width:max-content;margin:0 auto 40px}
 .journal-article-heading .journal-meta{justify-content:center}
-.journal-article-heading h1{font-size:clamp(38px,4.6vw,65px);line-height:1.14;letter-spacing:-1.9px;margin:24px auto;max-width:890px}
+.journal-article-heading h1{font-size:clamp(38px,4.6vw,65px);line-height:1.14;letter-spacing:-1.9px;margin:24px auto;max-width:890px;text-wrap:balance}
+.journal-article-heading h1.long-title{font-size:clamp(30px,3.6vw,48px);letter-spacing:-1.1px;max-width:760px}
 .journal-deck{max-width:640px;margin:0 auto 26px;font-size:15px;line-height:1.9;color:#7a8470}
 .journal-byline{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;font-size:11px;color:#7b846e}
 .journal-author-icon{display:grid;place-items:center;border:1px solid #cdd6bf;border-radius:50%;height:33px;width:33px;color:#718459}

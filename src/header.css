@@ -107,6 +107,7 @@
 .resort-carousel { height: clamp(780px, 100svh, 1100px); padding-top: 190px; }
 .page-hero { height: 650px; }
 .page-hero > .page-hero-copy { padding-top: 150px; }
+.page-hero-long h1 { font-size: clamp(28px, 3.4vw, 44px); line-height: 1.2; letter-spacing: -0.6px; max-width: 18ch; }
 html { scroll-padding-top: 100px; }
 @media (max-width: 1200px) and (min-width: 1051px) {
   .nav-inner { gap: 18px; padding-left: 3%; padding-right: 3%; }

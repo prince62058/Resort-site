@@ -12,7 +12,7 @@ export default function Header({
   setMenu,
   book
 }) {
-  const links = site.pages.filter(p => p.nav).map(p => ['/' + p.slug, p.name]);
+  const links = site.pages.filter(p => p.nav && String(p.name || '').trim().length <= 28).map(p => ['/' + p.slug, p.name]);
   const {
     pathname
   } = useLocation();

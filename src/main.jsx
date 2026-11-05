@@ -11,6 +11,7 @@ import { Link, NavLink } from './SiteLink.jsx';
 import { ArrowUpRight, ArrowRight, ArrowDown, Menu, X, MapPin, Phone, Leaf, Wifi, Wind, Waves, Coffee, ShieldCheck, ChevronLeft, ChevronRight, Plus, Minus, Check, Mail, Instagram } from 'lucide-react';
 import { site, loadContent, redirects, submitEnquiry } from './content.js';
 import { pagePath, resolveRoute } from '../shared/content.js';
+import { documentBlocks } from '../shared/guest-pages.js';
 import Seo from './Seo.jsx';
 import imageSources from './imageSources.json';
 import './styles.css';
@@ -126,7 +127,11 @@ function PageHero({
     subtitle = page.subtitle || subtitle;
     images = page.images;
   }
-  return <section className="page-hero"><PhotoSlideshow images={images || [image, ...site.photos.resortPhotos.filter(src => src !== image)]} alt="The Nature Nest resort" interval={7200} indicators={false} /><div className="page-hero-copy"><Eyebrow>{t("main.052", "THE NATURE NEST · MHOW")}</Eyebrow><h1>{title} <em>{italic}</em></h1><p>{subtitle}</p></div></section>;
+  const heading = String(title || '').trim();
+  const accent = String(italic || '').trim();
+  const showAccent = accent && accent.toLowerCase() !== heading.toLowerCase();
+  const longTitle = heading.length > 48;
+  return <section className={`page-hero${longTitle ? ' page-hero-long' : ''}`}><PhotoSlideshow images={images || [image, ...site.photos.resortPhotos.filter(src => src !== image)]} alt="The Nature Nest resort" interval={7200} indicators={false} /><div className="page-hero-copy"><Eyebrow>{t("main.052", "THE NATURE NEST · MHOW")}</Eyebrow><h1>{heading}{showAccent ? <> <em>{accent}</em></> : null}</h1>{subtitle ? <p>{String(subtitle).trim()}</p> : null}</div></section>;
 }
 function Stays({
   book
@@ -205,10 +210,17 @@ function Contact() {
         }
       }}><h3>{t("main.085", "A little hello goes a long way.")}</h3><label>{t("main.086", "Your name")}<input name="name" required maxLength={120} placeholder="Full name" /></label><div className="form-row"><label>{t("main.087", "Email address")}<input type="email" name="email" required maxLength={254} placeholder="you@example.com" /></label><label>{t("main.088", "Phone number")}<input type="tel" name="phone" maxLength={50} placeholder="Your phone number" /></label></div><label>{t("main.089", "What do you have in mind?")}<textarea name="message" required maxLength={5000} rows="4" placeholder="Tell us about your visit…" /></label><input className="form-trap" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" /><button disabled={busy} className="button">{busy ? 'Sending…' : 'Send enquiry'} <ArrowUpRight size={17} /></button>{notice && <p className="form-notice" role="status">{notice}</p>}<small>{t("main.090", "Our resort team will reply using your contact details.")}</small><FormPrivacy /></form></section><ContactHelp /></>;
 }
+function richText(value) {
+  return String(value || '').split(/(\*\*[^*]+\*\*)/g).map((part, i) => {
+    const bold = /^\*\*([^*]+)\*\*$/.exec(part);
+    return bold ? <strong key={i}>{bold[1]}</strong> : part;
+  });
+}
 function CustomPage({
   page
 }) {
-  return <><PageHero title={page.heading || page.name} italic={page.accent} subtitle={page.subtitle} /><article className="section article">{page.body.split('\n\n').map((p, i) => <p key={i}>{p}</p>)}</article></>;
+  const blocks = documentBlocks(page.body, site.settings);
+  return <><PageHero title={page.heading || page.name} italic={page.accent} subtitle={page.subtitle} /><article className="section article">{blocks.map((b, i) => b.type === 'ul' ? <ul key={i}>{b.items.map((v, j) => <li key={j}>{richText(v)}</li>)}</ul> : b.type === 'p' ? <p key={i}>{richText(b.text)}</p> : <b.type key={i} id={b.id}>{richText(b.text)}</b.type>)}</article></>;
 }
 function MissingPage() {
   return <section className="section centered"><h1>{t("main.098", "Page not found.")}</h1><Button to="/">{t("main.099", "Back home")}</Button></section>;
