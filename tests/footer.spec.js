@@ -1,5 +1,6 @@
 import {test, expect} from '@playwright/test';
-test.beforeEach(async({page})=>{await page.route('**/api/enquiries',route=>route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({ok:true,id:'ui-test'})}));});
+test.beforeEach(async({page})=>{await page.route('**/api/enquiries',route=>route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({ok:true,id:'ui-test'})}));
+await page.route('**/api/v1/public/enquiries',route=>route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({success:true,data:{leadId:'ui-test'}})}));});
 
 test('footer keeps resort information and provides working guest actions', async ({page}) => {
   await page.emulateMedia({reducedMotion: 'reduce'});
