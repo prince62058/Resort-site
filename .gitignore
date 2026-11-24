@@ -1,0 +1,18 @@
+node_modules/
+dist/
+test-results/
+playwright-report/
+.DS_Store
+
+# Local exports, generated previews and test screenshots.
+output/
+thenaturenestresort.com/
+tests/*.png
+
+# Local environment and hosting state.
+.env
+.env.*
+!.env.example
+.vercel/
+.netlify/
+*.log

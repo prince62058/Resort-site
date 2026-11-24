@@ -1,0 +1,12 @@
+{
+  "tool": "built-in image_gen",
+  "mode": "edit",
+  "source": "public/assets/banners/2023-12-03-1.jpg",
+  "output": "public/assets/enhanced/reception-regenerated-v1.png",
+  "webAsset": "public/assets/enhanced/reception-regenerated-v1.webp",
+  "dimensions": [
+    1536,
+    1024
+  ],
+  "prompt": "Use case: precise-object-edit.\nAsset type: large landscape resort website photograph.\nInput image 1 is the edit target: the real Nature Nest resort reception, photographed from its entrance.\nPrimary request: faithfully regenerate this low-resolution photograph with clean, natural, high-resolution photographic detail. This is a quality restoration, not an interior redesign.\nPreserve: the same small reception space, central tan carved tiered fountain in the foreground, blue-black stone steps, red-edged floor runners, gray upholstered seating on both sides, white plant pots, warm tan woven wooden wall panels, central wooden reception counter, patterned rear wall, existing ceiling fan and warm recessed ceiling lights. Retain the same perspective, relative placement, scale, colors and architecture.\nComposition: horizontal landscape photograph approximately 3:2, framed around the lobby interior and foreground fountain, suitable for a large website image. Use the central lobby view, with a natural architectural photography lens and straight vertical lines; exclude the exterior roof and sign from this tighter landscape framing.\nImprove only: resolve pixelation, compression, muddy details and motion softness into believable fine surface textures; balanced warm interior exposure with soft daylight from entrance. Crisp but natural, no oversharpened edges.\nConstraints: no people, no additional furniture or luxury amenities, no architecture changes, no added signs, text, logos or watermark. Do not turn the modest real property into a different resort. Generate at the highest available resolution, ideally 2400 pixels wide or greater."
+}
